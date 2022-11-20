@@ -1,0 +1,25 @@
+body {
+  background: transparent;
+}
+
+#image,
+#video,
+#webview {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: inline-flex;
+
+  object-fit: contain;
+}
+
+#image,
+#video {
+  background: #000;
+}
+
+[hidden="true"] {
+  display: none !important;
+}
