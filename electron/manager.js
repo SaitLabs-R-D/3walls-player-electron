@@ -1,5 +1,11 @@
 const axios = require("axios");
-const { BrowserWindow, screen, ipcMain, globalShortcut } = require("electron");
+const {
+  BrowserWindow,
+  screen,
+  ipcMain,
+  globalShortcut,
+  dialog,
+} = require("electron");
 const path = require("path");
 
 class Manager {
@@ -20,11 +26,18 @@ class Manager {
   initScreens() {
     let windowsLoadedCount = 0;
 
-    this.data.map((screen, index) => {
-      const newScreen = new Screen(index, screen.data);
+    this.data.map((window, index) => {
+      const newScreen = new Screen(
+        window.order,
+        window.screens,
+        this.data.length
+      );
       this.screens.push(newScreen);
 
       newScreen.window.on("ready-to-show", () => {
+        newScreen.window.webContents.send("init", {
+          order: window.order,
+        });
         if (++windowsLoadedCount === this.data.length) {
           // once all windows are loaded, we can start the party ✨
           this.init();
@@ -60,41 +73,20 @@ class Manager {
 
   async getData(token, depth = 0) {
     try {
-      // const res = await axios.get(
-      //   "http://localhost:5004/api/v1/sockets/create/screen-sync"
-      // );
-      // this.data = res.data.screens;
-      this.data = [
-        {
-          data: [
-            "video https://www.proprep.com/Content/Videos/HowItWorks.mp4",
-            "browser https://www.mentimeter.com/",
-            "image https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/dog-puppy-on-garden-royalty-free-image-1586966191.jpg?crop=1.00xw:0.669xh;0,0.190xh&resize=640:*",
-          ],
-        },
-        {
-          data: [
-            "video https://www.proprep.com/Content/Videos/HowItWorks.mp4",
-            "image https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/dog-puppy-on-garden-royalty-free-image-1586966191.jpg?crop=1.00xw:0.669xh;0,0.190xh&resize=640:*",
-            "browser https://www.sport5.co.il/",
-          ],
-        },
-        {
-          data: [
-            "image https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/dog-puppy-on-garden-royalty-free-image-1586966191.jpg?crop=1.00xw:0.669xh;0,0.190xh&resize=640:*",
-            "video https://www.proprep.com/Content/Videos/HowItWorks.mp4",
-            "browser https://www.sport5.co.il/",
-          ],
-        },
-      ];
+      const res = await axios.get(
+        "http://localhost:5004/api/v1/watch/data?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsZXNzb25faWQiOiI2Mzc2MDJmYzg0M2IyMWU2MTQ0ZmQ2ZjYiLCJsZXNzb25fdHlwZSI6InB1Ymxpc2hlZCIsImV4cCI6MTY2OTA0MzQ5Nn0.8TUoIUSzZb20-IIu3-kMgHkoi63PYoiw5k9ccfMGimo"
+      );
+      this.data = res.data.data;
+
       this.initScreens();
     } catch (e) {
-      console.log(e);
       if (depth < 3) {
         this.getData(token, depth + 1);
       } else {
-        console.log("failed to load data");
-        // todo : handle error
+        dialog.showErrorBox(
+          "Error",
+          "Failed to load data, please try again later\n \n" + e
+        );
       }
     }
   }
@@ -102,10 +94,12 @@ class Manager {
 
 class Screen {
   i = -1;
+  screensCount = 0;
 
-  constructor(pos, data) {
+  constructor(pos, data, screensCount) {
     this.data = data;
     this.pos = pos;
+    this.screensCount = screensCount;
     this.createWindow();
   }
 
@@ -116,7 +110,7 @@ class Screen {
       // fullscreen: true,
       autoHideMenuBar: true,
       height: scrn[0].workAreaSize.height,
-      width: scrn[0].workAreaSize.width / 3,
+      width: scrn[0].workAreaSize.width / this.screensCount,
       webPreferences: {
         preload: path.join(__dirname, "preload.js"),
         nodeIntegration: true,
@@ -125,7 +119,10 @@ class Screen {
       },
     });
 
-    this.window.setPosition((scrn[1].workArea.width / 3) * this.pos, 0);
+    this.window.setPosition(
+      (scrn[1].workArea.width / this.screensCount) * this.pos,
+      0
+    );
     this.window.loadFile("app/index.html");
   }
 
@@ -165,10 +162,12 @@ class Screen {
   }
 
   play(payload) {
-    const [type, url] = this.data[this.i]?.split(" ");
+    const { type_, url } = this.data[this.i];
+
+    console.log("play", type_, url);
 
     this.event("play", {
-      type,
+      type: type_,
       url,
       ...payload,
     });

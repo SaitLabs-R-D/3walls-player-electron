@@ -3,15 +3,23 @@ const { ipcRenderer } = require("electron");
 const elements = {
   browser: document.querySelector("#webview"),
   video: document.querySelector("#video"),
-  image: document.querySelector("#image"),
+  img: document.querySelector("#image"),
 };
+const info_div = document.querySelector("#center");
 
 ipcRenderer.on("play", (_, { type, url, timestamp }) => {
+  console.log("play", type, url);
   setup({ type, url, timestamp });
   cleanup(type);
 });
 
+ipcRenderer.on("init", (_, { order }) => {
+  info_div.children[0].innerHTML = order;
+});
+
 function setup({ type, url, timestamp }) {
+  info_div.setAttribute("hidden", "true");
+
   elements[type].src = url;
   elements[type].setAttribute("hidden", "false");
 
@@ -26,9 +34,9 @@ function cleanup(type) {
     elements.video.setAttribute("hidden", "true");
     elements.video.src = "";
   }
-  if (type !== "image") {
-    elements.image.setAttribute("hidden", "true");
-    elements.image.src = "";
+  if (type !== "img") {
+    elements.img.setAttribute("hidden", "true");
+    elements.img.src = "";
   }
   if (type !== "browser") {
     elements.browser.setAttribute("hidden", "true");

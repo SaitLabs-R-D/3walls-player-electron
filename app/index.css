@@ -1,5 +1,8 @@
 body {
   background: transparent;
+
+  margin: 0;
+  padding: 0;
 }
 
 #image,
@@ -18,6 +21,16 @@ body {
 #image,
 #video {
   background: #000;
+}
+
+#center {
+  height: 100vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-family: sans-serif;
 }
 
 [hidden="true"] {
