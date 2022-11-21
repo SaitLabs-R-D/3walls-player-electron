@@ -74,10 +74,10 @@ class Manager {
   async getData(token, depth = 0) {
     try {
       const res = await axios.get(
-        "http://localhost:5004/api/v1/watch/data?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsZXNzb25faWQiOiI2Mzc2MDJmYzg0M2IyMWU2MTQ0ZmQ2ZjYiLCJsZXNzb25fdHlwZSI6InB1Ymxpc2hlZCIsImV4cCI6MTY2OTA0MzQ5Nn0.8TUoIUSzZb20-IIu3-kMgHkoi63PYoiw5k9ccfMGimo"
+        "http://localhost:5004/api/v1/watch/data?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsZXNzb25faWQiOiI2Mzc2MDJmYzg0M2IyMWU2MTQ0ZmQ2ZjYiLCJsZXNzb25fdHlwZSI6InB1Ymxpc2hlZCIsImV4cCI6MTY2OTEwNTU2OX0.TEdmKREd5lJ1OuYq5Pxw5S69ll8Jt_ktYtbM_vthSbg"
       );
-      this.data = res.data.data;
 
+      this.data = res.data.data;
       this.initScreens();
     } catch (e) {
       if (depth < 3) {
