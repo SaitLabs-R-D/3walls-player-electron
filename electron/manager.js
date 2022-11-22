@@ -27,16 +27,12 @@ class Manager {
     let windowsLoadedCount = 0;
 
     this.data.map((window, index) => {
-      const newScreen = new Screen(
-        window.order,
-        window.screens,
-        this.data.length
-      );
+      const newScreen = new Screen(index, window, this.data.length);
       this.screens.push(newScreen);
 
       newScreen.window.on("ready-to-show", () => {
         newScreen.window.webContents.send("init", {
-          order: window.order,
+          order: index,
         });
         if (++windowsLoadedCount === this.data.length) {
           // once all windows are loaded, we can start the party ✨
@@ -71,13 +67,31 @@ class Manager {
     });
   }
 
+  formatData(data) {
+    data = data.sort((a, b) => a.order - b.order);
+
+    let newData = [];
+
+    for (let i = 0; i < data.length; i++) {
+      for (let j = 0; j < data[i].screens.length; j++) {
+        if (!newData[j]) {
+          newData[j] = [];
+        }
+
+        newData[j].push(data[i].screens[j]);
+      }
+    }
+
+    return newData;
+  }
+
   async getData(token, depth = 0) {
     try {
       const res = await axios.get(
-        "http://localhost:5004/api/v1/watch/data?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsZXNzb25faWQiOiI2Mzc2MDJmYzg0M2IyMWU2MTQ0ZmQ2ZjYiLCJsZXNzb25fdHlwZSI6InB1Ymxpc2hlZCIsImV4cCI6MTY2OTEwNTU2OX0.TEdmKREd5lJ1OuYq5Pxw5S69ll8Jt_ktYtbM_vthSbg"
+        "http://localhost:5004/api/v1/watch/data?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsZXNzb25faWQiOiI2Mzc2MDJmYzg0M2IyMWU2MTQ0ZmQ2ZjYiLCJsZXNzb25fdHlwZSI6InB1Ymxpc2hlZCIsImV4cCI6MTY2OTE5ODUwMH0.-jxDDLNRwvqL2yp5nXJwhgXqr9c1DxM8gB0TmPjaa1I"
       );
 
-      this.data = res.data.data;
+      this.data = this.formatData(res.data.data);
       this.initScreens();
     } catch (e) {
       if (depth < 3) {
