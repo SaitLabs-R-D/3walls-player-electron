@@ -5,7 +5,7 @@ const { Manager } = require("./manager");
 
 const APP_PREFIX = "threewalls-app";
 
-let mainWindow;
+let mainWindow, activateUrl;
 const manager = new Manager();
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -37,7 +37,7 @@ if (!gotTheLock) {
   });
 }
 
-const createWindow = async (url = false) => {
+const createWindow = (url = false) => {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
@@ -48,12 +48,6 @@ const createWindow = async (url = false) => {
   });
 
   mainWindow.loadFile("app/start/index.html");
-
-  if (url) {
-    mainWindow.webContents.on("did-finish-load", () => {
-      mainWindow.webContents.send("url", url);
-    });
-  }
 
   mainWindow.on("closed", () => {
     mainWindow = null;
@@ -71,14 +65,25 @@ app.on("open-url", (_, url) => {
   url = url.replace(`${APP_PREFIX}://`, "");
   manager.reset();
 
-  if (!mainWindow) {
-    createWindow(url);
-  } else {
-    mainWindow.webContents.send("url", url);
+  if (!app.isReady()) {
+    activateUrl = url;
+    return;
   }
+
+  if (!mainWindow) {
+    createWindow();
+  }
+
+  mainWindow.webContents.send("url", url);
 });
 
-app.on("ready", createWindow);
+app.on("ready", () => {
+  createWindow();
+
+  if (activateUrl) {
+    mainWindow.webContents.send("url", activateUrl);
+  }
+});
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
