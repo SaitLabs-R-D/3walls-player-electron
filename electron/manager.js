@@ -151,7 +151,7 @@ class Screen {
       (scrn[1].workArea.width / this.screensCount) * this.pos,
       0
     );
-    this.window.loadFile("app/index.html");
+    this.window.loadFile("app/stream/index.html");
   }
 
   createEvent(event, payload = {}) {
