@@ -52,20 +52,21 @@ const createWindow = async () => {
   mainWindow.on("closed", () => {
     mainWindow = null;
   });
-
-  ipcMain.on("start", (_, token) => {
-    manager.load(token);
-  });
 };
 
+ipcMain.on("start", (_, token) => {
+  mainWindow?.close();
+
+  manager.reset();
+  manager.load(token);
+});
+
 app.on("open-url", (_, url) => {
-  console.log("open-url", url);
+  manager.reset();
 
   if (!mainWindow) {
     createWindow();
   }
-
-  manager.reset();
 
   mainWindow.webContents.send("url", url.replace(`${APP_PREFIX}://`, ""));
 });

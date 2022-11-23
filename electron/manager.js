@@ -32,6 +32,8 @@ class Manager {
   }
 
   initScreens() {
+    console.log(this.data.length);
+
     let windowsLoadedCount = 0;
 
     this.data.map((window, index) => {
@@ -46,10 +48,6 @@ class Manager {
           // once all windows are loaded, we can start the party ✨
           this.init();
         }
-      });
-
-      newScreen.window.on("close", () => {
-        this.screens = this.screens.filter((_, i) => index !== i);
       });
     });
   }
@@ -68,9 +66,8 @@ class Manager {
       this.sendEvent("openDevTools");
     });
 
-    this.screens.forEach((screen, index) => {
+    this.screens.forEach((screen) => {
       screen.window.on("closed", () => {
-        console.log("closed", index);
         this.screens = this.screens.filter((_, i) => screen.order !== i);
       });
     });
