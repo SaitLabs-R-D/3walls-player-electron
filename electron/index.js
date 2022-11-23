@@ -1,11 +1,15 @@
-const { app, BrowserWindow, dialog } = require("electron");
+const { app, BrowserWindow } = require("electron");
 const { ipcMain } = require("electron/main");
 const path = require("path");
 const { Manager } = require("./manager");
-
-const APP_PREFIX = "threewalls-app";
+const { Deeplink } = require("electron-deeplink");
+const isDev = require("electron-is-dev");
 
 let mainWindow, activateUrl;
+
+const APP_PREFIX = "threewalls-app";
+const deeplink = new Deeplink({ app, mainWindow, protocol: APP_PREFIX, isDev });
+
 const manager = new Manager();
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -37,7 +41,7 @@ if (!gotTheLock) {
   });
 }
 
-const createWindow = (url = false) => {
+const createWindow = () => {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
@@ -55,14 +59,16 @@ const createWindow = (url = false) => {
 };
 
 ipcMain.on("start", (_, token) => {
-  mainWindow?.close();
+  mainWindow?.minimize();
+
+  console.log("start", token);
 
   manager.reset();
   manager.load(token);
 });
 
-app.on("open-url", (_, url) => {
-  url = url.replace(`${APP_PREFIX}://`, "");
+deeplink.on("received", (url) => {
+  url = url.replace(`${APP_PREFIX}://`, "").replaceAll("/", "");
   manager.reset();
 
   if (!app.isReady()) {
