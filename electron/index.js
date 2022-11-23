@@ -49,17 +49,24 @@ const createWindow = async () => {
 
   mainWindow.loadFile("app/start/index.html");
 
+  mainWindow.on("closed", () => {
+    mainWindow = null;
+  });
+
   ipcMain.on("start", (_, token) => {
     manager.load(token);
   });
 };
 
-app.on("open-url", (event, url) => {
+app.on("open-url", (_, url) => {
   console.log("open-url", url);
+
+  if (!mainWindow) {
+    createWindow();
+  }
 
   manager.reset();
 
-  mainWindow.webContents.openDevTools();
   mainWindow.webContents.send("url", url.replace(`${APP_PREFIX}://`, ""));
 });
 

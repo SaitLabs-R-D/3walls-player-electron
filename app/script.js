@@ -6,11 +6,12 @@ const elements = {
   img: document.querySelector("#image"),
 };
 const info_div = document.querySelector("#center");
+let element;
 
 ipcRenderer.on("play", (_, { type, url, timestamp }) => {
   console.log("play", type, url);
+  cleanup();
   setup({ type, url, timestamp });
-  cleanup(type);
 });
 
 ipcRenderer.on("init", (_, { order }) => {
@@ -20,27 +21,22 @@ ipcRenderer.on("init", (_, { order }) => {
 function setup({ type, url, timestamp }) {
   info_div.setAttribute("hidden", "true");
 
-  elements[type].src = url;
-  elements[type].setAttribute("hidden", "false");
-
   if (type === "video") {
-    // todo elements.video.requestFullscreen();
-    handleSynchVideo(timestamp);
+    element = createVideo(url);
+
+    element.addEventListener("loadedmetadata", () =>
+      handleSynchVideo(timestamp)
+    );
+  } else if (type === "browser") {
+    element = createWebview(url);
+  } else if (type === "img") {
+    element = createImage(url);
   }
 }
 
-function cleanup(type) {
-  if (type !== "video") {
-    elements.video.setAttribute("hidden", "true");
-    elements.video.src = "";
-  }
-  if (type !== "img") {
-    elements.img.setAttribute("hidden", "true");
-    elements.img.src = "";
-  }
-  if (type !== "browser") {
-    elements.browser.setAttribute("hidden", "true");
-  }
+function cleanup() {
+  element?.remove();
+  element = null;
 }
 
 const handleSynchVideo = (timestamp, skip = 0) => {
@@ -48,4 +44,32 @@ const handleSynchVideo = (timestamp, skip = 0) => {
   const diff = now - timestamp;
 
   elements.video.currentTime = diff / 1000 + skip;
+};
+
+const createVideo = (url) => {
+  const video = document.createElement("video");
+  video.id = "video";
+  video.src = url;
+  video.setAttribute("autoplay", "true");
+
+  document.body.appendChild(video);
+
+  return document.getElementById("video");
+};
+const createWebview = (url) => {
+  const webview = document.createElement("webview");
+  webview.id = "webview";
+  webview.src = url;
+  document.body.appendChild(webview);
+
+  return document.getElementById("webview");
+};
+const createImage = (url) => {
+  const img = document.createElement("img");
+  img.id = "image";
+  img.src = url;
+
+  document.body.appendChild(img);
+
+  return document.getElementById("image");
 };

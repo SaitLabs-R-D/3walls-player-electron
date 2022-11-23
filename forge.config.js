@@ -2,8 +2,8 @@ module.exports = {
   packagerConfig: {
     protocols: [
       {
-        name: "Electron Fiddle",
-        schemes: ["electron-fiddle"],
+        name: "Threewalls App",
+        schemes: ["threewalls-app"],
       },
     ],
   },
@@ -24,6 +24,12 @@ module.exports = {
     {
       name: "@electron-forge/maker-rpm",
       config: {},
+    },
+    {
+      name: "@electron-forge/maker-dmg",
+      config: {
+        format: "ULFO",
+      },
     },
   ],
 };
