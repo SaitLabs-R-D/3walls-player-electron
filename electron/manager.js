@@ -102,7 +102,7 @@ class Manager {
   async getData(token, depth = 0) {
     try {
       const res = await axios.get(
-        `http://localhost:5004/api/v1/watch/data?token=${token}`
+        `https://app.3walls.org/api/v1/watch/data?token=${token}`
       );
 
       this.data = this.formatData(res.data.data);
