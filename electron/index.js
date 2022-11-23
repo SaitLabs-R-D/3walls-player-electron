@@ -37,7 +37,7 @@ if (!gotTheLock) {
   });
 }
 
-const createWindow = async () => {
+const createWindow = async (url = false) => {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
@@ -48,6 +48,12 @@ const createWindow = async () => {
   });
 
   mainWindow.loadFile("app/start/index.html");
+
+  if (url) {
+    mainWindow.webContents.on("did-finish-load", () => {
+      mainWindow.webContents.send("url", url);
+    });
+  }
 
   mainWindow.on("closed", () => {
     mainWindow = null;
@@ -62,13 +68,14 @@ ipcMain.on("start", (_, token) => {
 });
 
 app.on("open-url", (_, url) => {
+  url = url.replace(`${APP_PREFIX}://`, "");
   manager.reset();
 
   if (!mainWindow) {
-    createWindow();
+    createWindow(url);
+  } else {
+    mainWindow.webContents.send("url", url);
   }
-
-  mainWindow.webContents.send("url", url.replace(`${APP_PREFIX}://`, ""));
 });
 
 app.on("ready", createWindow);

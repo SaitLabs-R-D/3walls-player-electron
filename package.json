@@ -2,7 +2,7 @@
   "name": "3walls-app",
   "productName": "3walls-app",
   "version": "1.0.0",
-  "description": "My Electron application description",
+  "description": "3walls-app",
   "main": "electron/index.js",
   "scripts": {
     "start": "electron-forge start",
