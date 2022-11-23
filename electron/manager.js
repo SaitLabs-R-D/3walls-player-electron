@@ -13,10 +13,18 @@ class Manager {
   data = [];
   token = "";
 
-  constructor(token) {
-    console.log("Manager created");
+  load(token) {
     this.token = token;
     this.getData(token);
+  }
+
+  reset() {
+    this.screens.forEach((screen) => {
+      screen.window.close();
+    });
+    this.screens = [];
+    this.data = [];
+    this.token = "";
   }
 
   init() {
@@ -59,6 +67,13 @@ class Manager {
     globalShortcut.register("CommandOrControl+1+2", () => {
       this.sendEvent("openDevTools");
     });
+
+    this.screens.forEach((screen, index) => {
+      screen.window.on("closed", () => {
+        console.log("closed", index);
+        this.screens = this.screens.filter((_, i) => screen.order !== i);
+      });
+    });
   }
 
   sendEvent(event, payload) {
@@ -68,6 +83,8 @@ class Manager {
   }
 
   formatData(data) {
+    // convert data from vertical to horizontal
+
     data = data.sort((a, b) => a.order - b.order);
 
     let newData = [];
@@ -88,7 +105,7 @@ class Manager {
   async getData(token, depth = 0) {
     try {
       const res = await axios.get(
-        "http://localhost:5004/api/v1/watch/data?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsZXNzb25faWQiOiI2Mzc2MDJmYzg0M2IyMWU2MTQ0ZmQ2ZjYiLCJsZXNzb25fdHlwZSI6InB1Ymxpc2hlZCIsImV4cCI6MTY2OTE5ODUwMH0.-jxDDLNRwvqL2yp5nXJwhgXqr9c1DxM8gB0TmPjaa1I"
+        `http://localhost:5004/api/v1/watch/data?token=${token}`
       );
 
       this.data = this.formatData(res.data.data);
