@@ -1,12 +1,7 @@
 const axios = require("axios");
-const {
-  BrowserWindow,
-  screen,
-  ipcMain,
-  globalShortcut,
-  dialog,
-} = require("electron");
+const { BrowserWindow, screen, globalShortcut, dialog } = require("electron");
 const path = require("path");
+const log = require("electron-log");
 
 class Manager {
   screens = [];
@@ -20,7 +15,9 @@ class Manager {
 
   reset() {
     this.screens.forEach((screen) => {
-      screen.window.close();
+      if (!screen.window.isDestroyed()) {
+        screen.window.close();
+      }
     });
     this.screens = [];
     this.data = [];
@@ -32,8 +29,6 @@ class Manager {
   }
 
   initScreens() {
-    console.log(this.data.length);
-
     let windowsLoadedCount = 0;
 
     this.data.map((window, index) => {
@@ -80,7 +75,7 @@ class Manager {
   }
 
   formatData(data) {
-    // convert data from vertical to horizontal
+    // ? converts data from vertical to horizontal
 
     data = data.sort((a, b) => a.order - b.order);
 
@@ -99,7 +94,7 @@ class Manager {
     return newData;
   }
 
-  async getData(token, depth = 0) {
+  async getData(token) {
     try {
       const res = await axios.get(
         `https://app.3walls.org/api/v1/watch/data?token=${token}`
@@ -108,14 +103,11 @@ class Manager {
       this.data = this.formatData(res.data.data);
       this.initScreens();
     } catch (e) {
-      if (depth < 3) {
-        this.getData(token, depth + 1);
-      } else {
-        dialog.showErrorBox(
-          "Error",
-          "Failed to load data, please try again later\n \n" + e
-        );
-      }
+      log.error("failed to load data", e);
+      dialog.showErrorBox(
+        "Error",
+        "Failed to load data, please try again later\n \n" + e
+      );
     }
   }
 }
@@ -135,10 +127,10 @@ class Screen {
     const scrn = screen.getAllDisplays();
 
     this.window = new BrowserWindow({
-      // fullscreen: true,
       autoHideMenuBar: true,
-      height: scrn[0].workAreaSize.height,
-      width: scrn[0].workAreaSize.width / this.screensCount,
+      width: 500,
+      height: 500,
+      center: true,
       webPreferences: {
         preload: path.join(__dirname, "preload.js"),
         nodeIntegration: true,
@@ -147,10 +139,11 @@ class Screen {
       },
     });
 
-    this.window.setPosition(
-      (scrn[1].workArea.width / this.screensCount) * this.pos,
-      0
-    );
+    if (scrn[this.pos]) {
+      this.window.setPosition(scrn[this.pos].workArea.x, 0);
+      this.window.fullScreen = true;
+    }
+
     this.window.loadFile("app/stream/index.html");
   }
 

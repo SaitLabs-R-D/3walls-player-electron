@@ -16,6 +16,7 @@ ipcRenderer.on("play", (_, { type, url, timestamp }) => {
 
 ipcRenderer.on("init", (_, { order }) => {
   info_div.children[0].innerHTML = order;
+  document.title = "screen " + order;
 });
 
 function setup({ type, url, timestamp }) {
