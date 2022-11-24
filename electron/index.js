@@ -2,10 +2,16 @@ const { app, BrowserWindow, dialog } = require("electron");
 const { ipcMain } = require("electron/main");
 const path = require("path");
 const { Manager } = require("./manager");
+const { Deeplink } = require("electron-deeplink");
+const isDev = require("electron-is-dev");
 
-const APP_PREFIX = "threewalls-app";
+const log = require("electron-log");
 
 let mainWindow, activateUrl;
+
+const APP_PREFIX = "threewalls-app";
+const deeplink = new Deeplink({ app, mainWindow, protocol: APP_PREFIX, isDev });
+
 const manager = new Manager();
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -28,7 +34,7 @@ const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
   app.quit();
 } else {
-  app.on("second-instance", (event, commandLine, workingDirectory) => {
+  app.on("second-instance", (_event, _commandLine, _workingDirectory) => {
     // Someone tried to run a second instance, we should focus our window.
     if (mainWindow) {
       if (mainWindow.isMinimized()) mainWindow.restore();
@@ -37,10 +43,11 @@ if (!gotTheLock) {
   });
 }
 
-const createWindow = (url = false) => {
+const createWindow = () => {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    center: true,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -55,34 +62,30 @@ const createWindow = (url = false) => {
 };
 
 ipcMain.on("start", (_, token) => {
-  mainWindow?.close();
+  mainWindow?.minimize();
+
+  log.info("start streaming" + token);
 
   manager.reset();
   manager.load(token);
 });
 
-app.on("open-url", (_, url) => {
-  url = url.replace(`${APP_PREFIX}://`, "");
+deeplink.on("received", (url) => {
+  activateUrl = url;
   manager.reset();
 
-  if (!app.isReady()) {
-    activateUrl = url;
-    return;
-  }
+  if (!app.isReady()) return;
 
   if (!mainWindow) {
     createWindow();
   }
 
-  mainWindow.webContents.send("url", url);
+  sendUrl();
 });
 
 app.on("ready", () => {
   createWindow();
-
-  if (activateUrl) {
-    mainWindow.webContents.send("url", activateUrl);
-  }
+  sendUrl();
 });
 
 app.on("window-all-closed", () => {
@@ -91,8 +94,18 @@ app.on("window-all-closed", () => {
   }
 });
 
-app.on("activate", () => {
+app.on("activate", (...args) => {
+  log.info("activate", args);
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
   }
 });
+
+const sendUrl = () => {
+  if (mainWindow && activateUrl) {
+    mainWindow.webContents.send(
+      "url",
+      activateUrl.replace(`${APP_PREFIX}://`, "").replaceAll("/", "")
+    );
+  }
+};

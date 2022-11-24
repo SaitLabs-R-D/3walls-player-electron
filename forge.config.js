@@ -1,5 +1,7 @@
 module.exports = {
   packagerConfig: {
+    name: "3 walls app",
+    icon: "/images/icon.png",
     protocols: [
       {
         name: "Threewalls App",
