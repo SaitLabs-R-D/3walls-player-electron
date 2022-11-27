@@ -45,6 +45,7 @@ if (!gotTheLock) {
 
 const createWindow = () => {
   mainWindow = new BrowserWindow({
+    autoHideMenuBar: true,
     width: 800,
     height: 600,
     center: true,

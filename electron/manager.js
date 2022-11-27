@@ -9,6 +9,8 @@ class Manager {
   token = "";
 
   load(token) {
+    log.info("requesting to load screens");
+    this.reset();
     this.token = token;
     this.getData(token);
   }
@@ -29,6 +31,7 @@ class Manager {
   }
 
   initScreens() {
+    log.info("initiating " + this.screens.length + " screens");
     let windowsLoadedCount = 0;
 
     this.data.map((window, index) => {
@@ -131,6 +134,7 @@ class Screen {
       width: 500,
       height: 500,
       center: true,
+      icon: path.join(__dirname, "public", "logo.png"),
       webPreferences: {
         preload: path.join(__dirname, "preload.js"),
         nodeIntegration: true,
@@ -168,7 +172,7 @@ class Screen {
 
   next(timestamp = {}) {
     if (this.i >= this.data.length - 1) return;
-    console.log("next");
+    log.info("next");
 
     this.i++;
     this.play(timestamp);
@@ -176,7 +180,7 @@ class Screen {
 
   prev(timestamp = {}) {
     if (this.i <= 0) return;
-    console.log("prev");
+    log.info("prev");
 
     this.i--;
     this.play(timestamp);
@@ -185,7 +189,7 @@ class Screen {
   play(payload) {
     const { type_, url } = this.data[this.i];
 
-    console.log("play", type_, url);
+    log.info("playing", type_, url);
 
     this.event("play", {
       type: type_,
