@@ -12,8 +12,6 @@ let mainWindow, activateUrl;
 const APP_PREFIX = "threewalls-app";
 const deeplink = new Deeplink({ app, mainWindow, protocol: APP_PREFIX, isDev });
 
-const manager = new Manager();
-
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
   app.quit();
@@ -42,6 +40,15 @@ if (!gotTheLock) {
     }
   });
 }
+
+const focusMainWindow = () => {
+  if (mainWindow) {
+    mainWindow.show();
+    mainWindow.focus();
+  }
+};
+
+const manager = new Manager(focusMainWindow);
 
 const createWindow = () => {
   mainWindow = new BrowserWindow({

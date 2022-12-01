@@ -9,4 +9,5 @@ ipcRenderer.on("url", (_, url) => {
 
 start.addEventListener("click", () => {
   ipcRenderer.send("start", inp.value);
+  inp.value = "";
 });

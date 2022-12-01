@@ -6,6 +6,8 @@ body {
   justify-content: center;
   flex-direction: column;
   gap: 35px;
+
+  direction: rtl;
 }
 
 .logo {
@@ -46,4 +48,16 @@ button {
   background: rgb(52, 152, 219);
   cursor: pointer;
   font-weight: 600;
+}
+
+input:placeholder-shown ~ button {
+  display: none;
+}
+input:placeholder-shown ~ p {
+  display: inline-block;
+}
+p {
+  display: none;
+  font-size: 14px;
+  text-align: center;
 }

@@ -1,10 +1,5 @@
 const { ipcRenderer } = require("electron");
 
-const elements = {
-  browser: document.querySelector("#webview"),
-  video: document.querySelector("#video"),
-  img: document.querySelector("#image"),
-};
 const info_div = document.querySelector("#center");
 let element;
 
@@ -17,6 +12,19 @@ ipcRenderer.on("play", (_, { type, url, timestamp }) => {
 ipcRenderer.on("init", (_, { order }) => {
   info_div.children[0].innerHTML = order;
   document.title = "screen " + order;
+});
+
+ipcRenderer.on("pauseOrContinue", (_, { timestamp }) => {
+  handleSynchVideo(timestamp, element.currentTime);
+  if (element.paused) {
+    element.play();
+  } else {
+    element.pause();
+  }
+});
+
+ipcRenderer.on("fastForward", (_, { timestamp, by }) => {
+  handleSynchVideo(timestamp, element.currentTime + by);
 });
 
 function setup({ type, url, timestamp }) {
@@ -44,7 +52,14 @@ const handleSynchVideo = (timestamp, skip = 0) => {
   const now = new Date().getTime();
   const diff = now - timestamp;
 
-  elements.video.currentTime = diff / 1000 + skip;
+  console.log("sync", {
+    diff,
+    skip,
+    timestamp: diff / 1000 + skip,
+    ts: timestamp,
+  });
+
+  element.currentTime = diff / 1000 + skip;
 };
 
 const createVideo = (url) => {

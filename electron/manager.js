@@ -2,11 +2,16 @@ const axios = require("axios");
 const { BrowserWindow, screen, globalShortcut, dialog } = require("electron");
 const path = require("path");
 const log = require("electron-log");
+const isDev = require("electron-is-dev");
 
 class Manager {
   screens = [];
   data = [];
   token = "";
+
+  constructor(focusMainWindow) {
+    this.focusMainWindow = focusMainWindow;
+  }
 
   load(token) {
     log.info("requesting to load screens");
@@ -59,9 +64,27 @@ class Manager {
       this.sendEvent("prev", { timestamp: Date.now() });
     });
 
-    // ! remove when production
+    globalShortcut.register("CommandOrControl+Space", () => {
+      this.sendEvent("pauseOrContinue", { timestamp: Date.now() });
+    });
+
+    globalShortcut.register("CommandOrControl+Right", () => {
+      this.sendEvent("fastForward", { timestamp: Date.now(), by: 1 });
+    });
+
+    globalShortcut.register("CommandOrControl+Left", () => {
+      this.sendEvent("fastForward", { timestamp: Date.now(), by: -1 });
+    });
+
+    globalShortcut.register("Escape", () => {
+      this.focusMainWindow();
+      this.reset();
+    });
+
     globalShortcut.register("CommandOrControl+1+2", () => {
-      this.sendEvent("openDevTools");
+      if (isDev) {
+        this.sendEvent("openDevTools");
+      }
     });
 
     this.screens.forEach((screen) => {
@@ -143,9 +166,20 @@ class Screen {
       },
     });
 
-    if (scrn[this.pos]) {
+    if (!isDev && scrn[this.pos]) {
       this.window.setPosition(scrn[this.pos].workArea.x, 0);
       this.window.fullScreen = true;
+    }
+
+    if (isDev) {
+      this.window.setPosition(
+        (scrn[0].workArea.width / this.screensCount) * this.pos,
+        0
+      );
+      this.window.setSize(
+        scrn[0].workArea.width / this.screensCount,
+        scrn[0].workArea.height
+      );
     }
 
     this.window.loadFile("app/stream/index.html");
@@ -157,6 +191,12 @@ class Screen {
     }
     if (event === "prev") {
       return this.prev(payload);
+    }
+    if (event === "pauseOrContinue") {
+      return this.pauseOrContinue(payload);
+    }
+    if (event === "fastForward") {
+      return this.fastForward(payload);
     }
 
     if (event === "openDevTools") {
@@ -171,7 +211,10 @@ class Screen {
   }
 
   next(timestamp = {}) {
-    if (this.i >= this.data.length - 1) return;
+    if (this.i >= this.data.length - 1) {
+      // todo : end session
+      return;
+    }
     log.info("next");
 
     this.i++;
@@ -184,6 +227,18 @@ class Screen {
 
     this.i--;
     this.play(timestamp);
+  }
+
+  pauseOrContinue(timestamp = {}) {
+    if (this.data[this.i].type_ !== "video") return;
+
+    this.event("pauseOrContinue", timestamp);
+  }
+
+  fastForward({ timestamp, by = 0.0 }) {
+    if (this.data[this.i].type_ !== "video") return;
+
+    this.event("fastForward", { timestamp, by });
   }
 
   play(payload) {
