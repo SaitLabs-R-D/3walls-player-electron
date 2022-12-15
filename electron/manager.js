@@ -4,6 +4,10 @@ const path = require("path");
 const log = require("electron-log");
 const isDev = require("electron-is-dev");
 
+const api = isDev
+  ? "http://localhost:5004/api/v1"
+  : `https://app.3walls.org/api/v1`;
+
 class Manager {
   screens = [];
   data = [];
@@ -122,9 +126,7 @@ class Manager {
 
   async getData(token) {
     try {
-      const res = await axios.get(
-        `https://app.3walls.org/api/v1/watch/data?token=${token}`
-      );
+      const res = await axios.get(`${api}/watch/data?token=${token}`);
 
       this.data = this.formatData(res.data.data);
       this.initScreens();
@@ -152,6 +154,8 @@ class Screen {
   createWindow() {
     const scrn = screen.getAllDisplays();
 
+    // if screen is rtl
+
     this.window = new BrowserWindow({
       autoHideMenuBar: true,
       width: 500,
@@ -173,7 +177,7 @@ class Screen {
 
     if (isDev) {
       this.window.setPosition(
-        (scrn[0].workArea.width / this.screensCount) * this.pos,
+        (scrn[0].workArea.width / this.screensCount) * (2 - this.pos), // ? `2 - this.pos` is to make the screens rtl
         0
       );
       this.window.setSize(
@@ -189,12 +193,15 @@ class Screen {
     if (event === "next") {
       return this.next(payload);
     }
+
     if (event === "prev") {
       return this.prev(payload);
     }
+
     if (event === "pauseOrContinue") {
       return this.pauseOrContinue(payload);
     }
+
     if (event === "fastForward") {
       return this.fastForward(payload);
     }
@@ -230,15 +237,24 @@ class Screen {
   }
 
   pauseOrContinue(timestamp = {}) {
-    if (this.data[this.i].type_ !== "video") return;
-
-    this.event("pauseOrContinue", timestamp);
+    if (this.data[this.i].type_ === "browser") {
+      this.event("passEventToWebview", { type: "keyDown", keyCode: "Space" });
+    }
+    if (this.data[this.i].type_ === "video") {
+      this.event("pauseOrContinue", timestamp);
+    }
   }
 
   fastForward({ timestamp, by = 0.0 }) {
-    if (this.data[this.i].type_ !== "video") return;
-
-    this.event("fastForward", { timestamp, by });
+    if (this.data[this.i].type_ === "browser") {
+      this.event("passEventToWebview", {
+        type: "keyDown",
+        keyCode: by > 0 ? "L" : "J",
+      });
+    }
+    if (this.data[this.i].type_ === "video") {
+      this.event("fastForward", { timestamp, by });
+    }
   }
 
   play(payload) {

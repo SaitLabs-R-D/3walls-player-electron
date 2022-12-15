@@ -24,7 +24,17 @@ ipcRenderer.on("pauseOrContinue", (_, { timestamp }) => {
 });
 
 ipcRenderer.on("fastForward", (_, { timestamp, by }) => {
+  // pass shortcut to webview
+  if (element.tagName === "WEBVIEW") {
+    element.send("fastForward", { timestamp, by });
+    return;
+  }
+
   handleSynchVideo(timestamp, element.currentTime + by);
+});
+
+ipcRenderer.on("passEventToWebview", (_, event) => {
+  handlePassEvent(event);
 });
 
 function setup({ type, url, timestamp }) {
@@ -60,6 +70,10 @@ const handleSynchVideo = (timestamp, skip = 0) => {
   });
 
   element.currentTime = diff / 1000 + skip;
+};
+
+const handlePassEvent = (event) => {
+  document.querySelector("webview")?.sendInputEvent(event);
 };
 
 const createVideo = (url) => {
