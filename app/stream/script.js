@@ -81,7 +81,6 @@ const createVideo = (url) => {
   video.id = "video";
   video.src = url;
 
-  video.setAttribute("autoplay", "true");
   video.setAttribute("controls", "true");
 
   document.body.appendChild(video);

@@ -63,7 +63,6 @@ const createWindow = () => {
   });
 
   mainWindow.loadFile("app/start/index.html");
-
   mainWindow.on("closed", () => {
     mainWindow = null;
   });
