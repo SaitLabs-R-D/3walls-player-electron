@@ -65,6 +65,10 @@ class Manager {
       this.sendEvent("next", { timestamp: Date.now() });
     });
 
+    globalShortcut.register("CommandOrControl+Tab", () => {
+      this.sendEvent("flipPosition", { timestamp: Date.now() });
+    });
+
     globalShortcut.register("CommandOrControl+p", () => {
       this.sendEvent("prev", { timestamp: Date.now() });
     });
@@ -144,6 +148,7 @@ class Manager {
 class Screen {
   i = -1;
   screensCount = 0;
+  toggledPosition = true;
 
   constructor(pos, data, screensCount) {
     this.data = data;
@@ -153,10 +158,6 @@ class Screen {
   }
 
   createWindow() {
-    const scrn = screen.getAllDisplays();
-
-    // if screen is rtl
-
     this.window = new BrowserWindow({
       autoHideMenuBar: true,
       width: 500,
@@ -171,14 +172,25 @@ class Screen {
       },
     });
 
-    if (!isDev && scrn[this.pos]) {
-      this.window.setPosition(scrn[this.pos].workArea.x, 0);
+    this.setPosition();
+
+    this.window.loadFile("app/stream/index.html");
+  }
+
+  setPosition() {
+    const posIndex = this.toggledPosition ? 2 - this.pos : this.pos;
+    const scrn = screen.getAllDisplays();
+
+    if (!isDev && scrn[posIndex]) {
+      this.window.fullScreen = false; // todo : verify needed
+      this.window.setPosition(scrn[posIndex].workArea.x, 0);
       this.window.fullScreen = true;
+      return;
     }
 
     if (isDev) {
       this.window.setPosition(
-        (scrn[0].workArea.width / this.screensCount) * (2 - this.pos), // ? `2 - this.pos` is to make the screens rtl
+        (scrn[0].workArea.width / this.screensCount) * posIndex, // ? * posIndex, rtl : ltr
         0
       );
       this.window.setSize(
@@ -186,8 +198,6 @@ class Screen {
         scrn[0].workArea.height
       );
     }
-
-    this.window.loadFile("app/stream/index.html");
   }
 
   createEvent(event, payload = {}) {
@@ -205,6 +215,11 @@ class Screen {
 
     if (event === "fastForward") {
       return this.fastForward(payload);
+    }
+
+    if (event === "flipPosition") {
+      this.toggledPosition = !this.toggledPosition;
+      return this.setPosition();
     }
 
     if (event === "openDevTools") {
