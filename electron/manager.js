@@ -177,18 +177,11 @@ class Screen {
     this.window.loadFile("app/stream/index.html");
   }
 
-  setPosition() {
+  async setPosition() {
     const posIndex = this.toggledPosition ? 2 - this.pos : this.pos;
     const scrn = screen.getAllDisplays();
 
-    if (!isDev && scrn[posIndex]) {
-      this.window.fullScreen = false; // todo : verify needed
-      this.window.setPosition(scrn[posIndex].workArea.x, 0);
-      this.window.fullScreen = true;
-      return;
-    }
-
-    if (isDev) {
+    if (isDev && false) {
       this.window.setPosition(
         (scrn[0].workArea.width / this.screensCount) * posIndex, // ? * posIndex, rtl : ltr
         0
@@ -197,6 +190,19 @@ class Screen {
         scrn[0].workArea.width / this.screensCount,
         scrn[0].workArea.height
       );
+      return;
+    }
+
+    if (scrn[posIndex]) {
+      this.window.setPosition(scrn[posIndex].workArea.x || 0, 0);
+      this.window.setFullScreen(true);
+    } else {
+      this.window.setFullScreen(false);
+      this.window.setPosition(scrn[0].workArea.x, 0);
+
+      setTimeout(() => {
+        this.window.show();
+      }, 250);
     }
   }
 
