@@ -177,11 +177,23 @@ class Screen {
     this.window.loadFile("app/stream/index.html");
   }
 
-  async setPosition() {
-    const posIndex = this.toggledPosition ? 2 - this.pos : this.pos;
-    const scrn = screen.getAllDisplays();
+  getAllDisplays() {
+    const screens = screen.getAllDisplays();
+    /*
+      ?why we sort them?
+      screens = [primary, secondary, tertiary]
+      and not [right, center, left] (or reversed)
+      that's why we order them by their x position
+    */
+    return screens.sort((a, b) => a.bounds.x - b.bounds.x);
+  }
 
-    if (isDev && false) {
+  async setPosition() {
+    const scrn = this.getAllDisplays();
+
+    const posIndex = this.toggledPosition ? 2 - this.pos : this.pos;
+
+    if (isDev) {
       this.window.setPosition(
         (scrn[0].workArea.width / this.screensCount) * posIndex, // ? * posIndex, rtl : ltr
         0
