@@ -62,27 +62,31 @@ class Manager {
 
   hanldeEvents() {
     globalShortcut.register("CommandOrControl+n", () => {
-      this.sendEvent("next", { timestamp: Date.now() });
+      this.sendEvent("next");
     });
 
     globalShortcut.register("CommandOrControl+Tab", () => {
-      this.sendEvent("flipPosition", { timestamp: Date.now() });
+      this.sendEvent("flipPosition");
     });
 
     globalShortcut.register("CommandOrControl+p", () => {
-      this.sendEvent("prev", { timestamp: Date.now() });
+      this.sendEvent("prev");
     });
 
     globalShortcut.register("CommandOrControl+Space", () => {
-      this.sendEvent("pauseOrContinue", { timestamp: Date.now() });
+      this.sendEvent("pauseOrContinue");
     });
 
     globalShortcut.register("CommandOrControl+Right", () => {
-      this.sendEvent("fastForward", { timestamp: Date.now(), by: 1 });
+      this.sendEvent("fastForward", { by: 1 });
     });
 
     globalShortcut.register("CommandOrControl+Left", () => {
-      this.sendEvent("fastForward", { timestamp: Date.now(), by: -1 });
+      this.sendEvent("fastForward", { by: -1 });
+    });
+
+    globalShortcut.register("CommandOrControl+f", () => {
+      this.sendEvent("fullscreen");
     });
 
     globalShortcut.register("Escape", () => {
@@ -103,8 +107,9 @@ class Manager {
     });
   }
 
-  sendEvent(event, payload) {
+  sendEvent(event, payload = {}) {
     this.screens.forEach((screen) => {
+      payload.timestamp = Date.now();
       screen.createEvent(event, payload);
     });
   }
@@ -177,11 +182,23 @@ class Screen {
     this.window.loadFile("app/stream/index.html");
   }
 
-  async setPosition() {
-    const posIndex = this.toggledPosition ? 2 - this.pos : this.pos;
-    const scrn = screen.getAllDisplays();
+  getAllDisplays() {
+    const screens = screen.getAllDisplays();
+    /*
+      ?why we sort them?
+      screens = [primary, secondary, tertiary]
+      and not [right, center, left] (or reversed)
+      that's why we order them by their x position
+    */
+    return screens.sort((a, b) => a.bounds.x - b.bounds.x);
+  }
 
-    if (isDev && false) {
+  async setPosition() {
+    const scrn = this.getAllDisplays();
+
+    const posIndex = this.toggledPosition ? 2 - this.pos : this.pos;
+
+    if (isDev) {
       this.window.setPosition(
         (scrn[0].workArea.width / this.screensCount) * posIndex, // ? * posIndex, rtl : ltr
         0
@@ -221,6 +238,10 @@ class Screen {
 
     if (event === "fastForward") {
       return this.fastForward(payload);
+    }
+
+    if (event === "fullscreen") {
+      return this.fullscreen(payload);
     }
 
     if (event === "flipPosition") {
@@ -276,6 +297,12 @@ class Screen {
     }
     if (this.data[this.i].type_ === "video") {
       this.event("fastForward", { timestamp, by });
+    }
+  }
+
+  fullscreen() {
+    if (this.data[this.i].type_ === "browser") {
+      this.event("passEventToWebview", { type: "keyDown", keyCode: "f" });
     }
   }
 
