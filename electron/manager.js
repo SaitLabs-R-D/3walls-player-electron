@@ -62,27 +62,31 @@ class Manager {
 
   hanldeEvents() {
     globalShortcut.register("CommandOrControl+n", () => {
-      this.sendEvent("next", { timestamp: Date.now() });
+      this.sendEvent("next");
     });
 
     globalShortcut.register("CommandOrControl+Tab", () => {
-      this.sendEvent("flipPosition", { timestamp: Date.now() });
+      this.sendEvent("flipPosition");
     });
 
     globalShortcut.register("CommandOrControl+p", () => {
-      this.sendEvent("prev", { timestamp: Date.now() });
+      this.sendEvent("prev");
     });
 
     globalShortcut.register("CommandOrControl+Space", () => {
-      this.sendEvent("pauseOrContinue", { timestamp: Date.now() });
+      this.sendEvent("pauseOrContinue");
     });
 
     globalShortcut.register("CommandOrControl+Right", () => {
-      this.sendEvent("fastForward", { timestamp: Date.now(), by: 1 });
+      this.sendEvent("fastForward", { by: 1 });
     });
 
     globalShortcut.register("CommandOrControl+Left", () => {
-      this.sendEvent("fastForward", { timestamp: Date.now(), by: -1 });
+      this.sendEvent("fastForward", { by: -1 });
+    });
+
+    globalShortcut.register("CommandOrControl+f", () => {
+      this.sendEvent("fullscreen");
     });
 
     globalShortcut.register("Escape", () => {
@@ -103,8 +107,9 @@ class Manager {
     });
   }
 
-  sendEvent(event, payload) {
+  sendEvent(event, payload = {}) {
     this.screens.forEach((screen) => {
+      payload.timestamp = Date.now();
       screen.createEvent(event, payload);
     });
   }
@@ -235,6 +240,10 @@ class Screen {
       return this.fastForward(payload);
     }
 
+    if (event === "fullscreen") {
+      return this.fullscreen(payload);
+    }
+
     if (event === "flipPosition") {
       this.toggledPosition = !this.toggledPosition;
       return this.setPosition();
@@ -288,6 +297,12 @@ class Screen {
     }
     if (this.data[this.i].type_ === "video") {
       this.event("fastForward", { timestamp, by });
+    }
+  }
+
+  fullscreen() {
+    if (this.data[this.i].type_ === "browser") {
+      this.event("passEventToWebview", { type: "keyDown", keyCode: "f" });
     }
   }
 
