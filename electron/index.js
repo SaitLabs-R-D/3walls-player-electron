@@ -66,8 +66,6 @@ const createWindow = () => {
   mainWindow.on("closed", () => {
     mainWindow = null;
   });
-
-  mainWindow.webContents.openDevTools();
 };
 
 ipcMain.on("start", (_, payload) => {
