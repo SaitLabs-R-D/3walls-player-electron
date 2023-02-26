@@ -1,6 +1,6 @@
 const { ipcRenderer } = require("electron");
 
-const start = document.querySelector("button");
+const cta = document.querySelectorAll("button");
 const inp = document.querySelector("input");
 
 ipcRenderer.on("url", (_, url) => {
@@ -9,11 +9,22 @@ ipcRenderer.on("url", (_, url) => {
 
 inp.addEventListener("keyup", (e) => {
   if (e.key === "Enter" && inp.value) {
-    start.click();
+    cta.click();
   }
 });
 
-start.addEventListener("click", () => {
-  ipcRenderer.send("start", inp.value);
-  inp.value = "";
-});
+cta.forEach((btn) =>
+  btn.addEventListener("click", (e) => {
+    const payload = {
+      token: inp.value,
+      isDev: false,
+    };
+
+    if (e.target.className.includes("dev")) {
+      payload.isDev = true;
+    }
+
+    ipcRenderer.send("start", payload);
+    inp.value = "";
+  })
+);

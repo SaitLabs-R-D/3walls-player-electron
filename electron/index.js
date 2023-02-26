@@ -66,15 +66,17 @@ const createWindow = () => {
   mainWindow.on("closed", () => {
     mainWindow = null;
   });
+
+  mainWindow.webContents.openDevTools();
 };
 
-ipcMain.on("start", (_, token) => {
+ipcMain.on("start", (_, payload) => {
   mainWindow?.minimize();
 
-  log.info("start streaming" + token);
+  log.info("start streaming" + payload.token + "\non " + payload.isDev);
 
   manager.reset();
-  manager.load(token);
+  manager.load(payload.token, payload.isDev);
 });
 
 deeplink.on("received", (url) => {

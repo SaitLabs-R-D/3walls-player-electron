@@ -28,7 +28,7 @@ body {
 }
 
 input,
-button {
+button.start {
   padding-block: 10px;
   text-align: center;
   border-radius: 10px;
@@ -44,10 +44,18 @@ input {
   color: rgb(26, 33, 43) !important;
 }
 
-button {
+button.start {
   background: rgb(52, 152, 219);
   cursor: pointer;
   font-weight: 600;
+}
+
+button.dev {
+  border: none;
+  background: transparent;
+  text-decoration: underline;
+  font-size: 1rem;
+  cursor: pointer;
 }
 
 input:placeholder-shown ~ button {

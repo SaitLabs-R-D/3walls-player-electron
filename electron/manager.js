@@ -18,9 +18,10 @@ class Manager {
     this.focusMainWindow = focusMainWindow;
   }
 
-  load(token) {
+  load(token, isDev) {
     log.info("requesting to load screens");
     this.reset();
+    this.isDev = isDev;
     this.token = token;
     this.getData(token);
   }
@@ -45,7 +46,7 @@ class Manager {
     let windowsLoadedCount = 0;
 
     this.data.map((window, index) => {
-      const newScreen = new Screen(index, window, this.data.length);
+      const newScreen = new Screen(index, window, this.data.length, this.isDev);
       this.screens.push(newScreen);
 
       newScreen.window.on("ready-to-show", () => {
@@ -155,10 +156,11 @@ class Screen {
   screensCount = 0;
   toggledPosition = true;
 
-  constructor(pos, data, screensCount) {
+  constructor(pos, data, screensCount, isDev) {
     this.data = data;
     this.pos = pos;
     this.screensCount = screensCount;
+    this.isDev = isDev;
     this.createWindow();
   }
 
@@ -198,7 +200,7 @@ class Screen {
 
     const posIndex = this.toggledPosition ? 2 - this.pos : this.pos;
 
-    if (isDev) {
+    if (this.isDev) {
       this.window.setPosition(
         (scrn[0].workArea.width / this.screensCount) * posIndex, // ? * posIndex, rtl : ltr
         0
