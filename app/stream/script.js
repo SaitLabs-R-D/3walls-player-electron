@@ -1,7 +1,7 @@
 const { ipcRenderer } = require("electron");
 
 const info_div = document.querySelector("#center");
-let element;
+let element, interval;
 
 ipcRenderer.on("play", (_, { type, url, timestamp }) => {
   console.log("play", type, url);
@@ -48,6 +48,10 @@ function setup({ type, url, timestamp }) {
     );
   } else if (type === "browser") {
     element = createWebview(url);
+
+    if (isYoutube(url)) {
+      handleYoutubeAutoPause();
+    }
   } else if (type === "img") {
     element = createImage(url);
   }
@@ -87,6 +91,7 @@ const createVideo = (url) => {
 
   return document.getElementById("video");
 };
+
 const createWebview = (url) => {
   const webview = document.createElement("webview");
   webview.id = "webview";
@@ -95,6 +100,7 @@ const createWebview = (url) => {
 
   return document.getElementById("webview");
 };
+
 const createImage = (url) => {
   const img = document.createElement("img");
   img.id = "image";
@@ -103,4 +109,62 @@ const createImage = (url) => {
   document.body.appendChild(img);
 
   return document.getElementById("image");
+};
+
+const isYoutube = (url) => url.includes("youtube") || url.includes("youtu.be");
+
+const handleYoutubeAutoPause = () => {
+  /*
+    This is the ugliest code I've ever written.
+    I'm sorry.
+
+    There are a couple of issues with youtube videos and webviews:
+
+    webview events are not very stable (dom-ready & did-stop-loading), and they don't fire consistently
+    it's also depends on internet connection speed & youtube player speed
+    so we cannot just fire it once on dom-ready, cause the video might not be loaded yet
+
+    ! this is a workaround, not a fix
+    ! there's a possible memory leak here
+  */
+
+  const code = `
+    try {
+      document.querySelector("#player video").pause();
+      document.querySelector("#player video").currentTime = 0;
+    } catch {};
+
+    function onYouTubePlayerReady(e) {
+      try {
+        e.stopVideo();
+      } catch {}
+    }
+  `;
+
+  const tryEcec = () => {
+    try {
+      element.executeJavaScript(code);
+    } catch {}
+  };
+
+  element.addEventListener("dom-ready", () => {
+    // youtube itself will call this function https://developers.google.com/youtube/iframe_api_reference
+    element.executeJavaScript(code);
+  });
+
+  // another one before the first 50ms
+  tryEcec();
+
+  const MAX_TRIES = 10;
+  let counter = 0;
+  clearInterval(interval);
+  interval = setInterval(() => {
+    counter++;
+
+    tryEcec();
+
+    if (counter > MAX_TRIES) {
+      clearInterval(interval);
+    }
+  }, 50);
 };
