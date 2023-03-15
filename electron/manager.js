@@ -1,5 +1,11 @@
 const axios = require("axios");
-const { BrowserWindow, screen, globalShortcut, dialog } = require("electron");
+const {
+  BrowserWindow,
+  screen,
+  globalShortcut,
+  dialog,
+  ipcMain,
+} = require("electron");
 const path = require("path");
 const log = require("electron-log");
 const isDev = require("electron-is-dev");
@@ -13,6 +19,7 @@ class Manager {
   screens = [];
   data = [];
   token = "";
+  ytTimestamps = [];
 
   constructor(focusMainWindow) {
     this.focusMainWindow = focusMainWindow;
@@ -35,6 +42,7 @@ class Manager {
     this.screens = [];
     this.data = [];
     this.token = "";
+    ipcMain.removeAllListeners("resInfo");
   }
 
   init() {
@@ -76,6 +84,9 @@ class Manager {
 
     globalShortcut.register("CommandOrControl+Space", () => {
       this.sendEvent("pauseOrContinue");
+      this.sendEvent("reqInfo", {
+        type: "yt-timestamp",
+      });
     });
 
     globalShortcut.register("CommandOrControl+Right", () => {
@@ -95,22 +106,29 @@ class Manager {
       this.reset();
     });
 
-    globalShortcut.register("CommandOrControl+1+2", () => {
-      if (isDev) {
+    if (isDev) {
+      globalShortcut.register("CommandOrControl+1+2", () => {
         this.sendEvent("openDevTools");
-      }
-    });
+      });
+    }
 
     this.screens.forEach((screen) => {
       screen.window.on("closed", () => {
         this.screens = this.screens.filter((_, i) => screen.order !== i);
       });
     });
+
+    ipcMain.on("resInfo", (_, payload) => {
+      if (payload.type === "yt-timestamp") {
+        this.handleSyncYtTimestamps(payload);
+      }
+    });
   }
 
   sendEvent(event, payload = {}) {
+    const now = Date.now();
     this.screens.forEach((screen) => {
-      payload.timestamp = Date.now();
+      payload.timestamp = now;
       screen.createEvent(event, payload);
     });
   }
@@ -133,6 +151,18 @@ class Manager {
     }
 
     return newData;
+  }
+
+  handleSyncYtTimestamps(payload) {
+    if (payload.type !== "yt-timestamp") return;
+
+    this.ytTimestamps.push(payload.data);
+
+    if (this.ytTimestamps.length !== this.screens.length) return;
+
+    const avg = this.ytTimestamps.reduce((a, b) => a + b) / this.screens.length;
+    this.ytTimestamps = [];
+    this.sendEvent("syncYtTimestamps", { skip: avg });
   }
 
   async getData(token) {
@@ -226,36 +256,24 @@ class Screen {
   }
 
   createEvent(event, payload = {}) {
-    if (event === "next") {
-      return this.next(payload);
+    switch (event) {
+      case "next":
+        return this.next(payload);
+      case "prev":
+        return this.prev(payload);
+      case "pauseOrContinue":
+        return this.pauseOrContinue(payload);
+      case "fastForward":
+        return this.fastForward(payload);
+      case "fullscreen":
+        return this.fullscreen(payload);
+      case "flipPosition":
+        return this.flipPosition(payload);
+      case "openDevTools":
+        return this.window.webContents.openDevTools(payload);
+      default:
+        this.event(event, payload);
     }
-
-    if (event === "prev") {
-      return this.prev(payload);
-    }
-
-    if (event === "pauseOrContinue") {
-      return this.pauseOrContinue(payload);
-    }
-
-    if (event === "fastForward") {
-      return this.fastForward(payload);
-    }
-
-    if (event === "fullscreen") {
-      return this.fullscreen(payload);
-    }
-
-    if (event === "flipPosition") {
-      this.toggledPosition = !this.toggledPosition;
-      return this.setPosition();
-    }
-
-    if (event === "openDevTools") {
-      this.window.webContents.openDevTools();
-    }
-
-    this.window.webContents.send(event, payload);
   }
 
   event(event, payload) {
@@ -283,7 +301,11 @@ class Screen {
 
   pauseOrContinue(timestamp = {}) {
     if (this.data[this.i].type_ === "browser") {
-      this.event("passEventToWebview", { type: "keyDown", keyCode: "Space" });
+      this.event("passEventToWebview", {
+        type: "keyDown",
+        keyCode: "Space",
+        ...timestamp,
+      });
     }
     if (this.data[this.i].type_ === "video") {
       this.event("pauseOrContinue", timestamp);

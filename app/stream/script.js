@@ -1,9 +1,13 @@
 const { ipcRenderer } = require("electron");
 
 const info_div = document.querySelector("#center");
-let element, interval;
+let element, crrType, crrUrl, crrTimestamp, interval;
 
 ipcRenderer.on("play", (_, { type, url, timestamp }) => {
+  crrType = type;
+  crrUrl = url;
+  crrTimestamp = timestamp;
+
   console.log("play", type, url);
   cleanup();
   setup({ type, url, timestamp });
@@ -37,6 +41,19 @@ ipcRenderer.on("passEventToWebview", (_, event) => {
   handlePassEvent(event);
 });
 
+ipcRenderer.on("syncYtTimestamps", (_, { timestamp, skip }) => {
+  handleSyncYoutube(timestamp, skip);
+});
+
+ipcRenderer.on("reqInfo", (_, event) => {
+  if (
+    (event.type === "yt-timestamp") & (crrType === "browser") &&
+    isYoutube(crrUrl)
+  ) {
+    handleSendYoutubeTimestamp();
+  }
+});
+
 function setup({ type, url, timestamp }) {
   info_div.setAttribute("hidden", "true");
 
@@ -51,6 +68,7 @@ function setup({ type, url, timestamp }) {
 
     if (isYoutube(url)) {
       handleYoutubeAutoPause();
+      handleSynchVideo(timestamp);
     }
   } else if (type === "img") {
     element = createImage(url);
@@ -62,18 +80,22 @@ function cleanup() {
   element = null;
 }
 
-const handleSynchVideo = (timestamp, skip = 0) => {
+const getTimeForSync = (timestamp, skip = 0) => {
+  /**
+   * ? what's going on?
+   *
+   * all 3 players are receiving the same timestamp
+   * but they are not synced
+   * we calculate the difference between the timestamp and the current time
+   */
+
   const now = new Date().getTime();
   const diff = now - timestamp;
+  return diff / 1000 + skip;
+};
 
-  console.log("sync", {
-    diff,
-    skip,
-    timestamp: diff / 1000 + skip,
-    ts: timestamp,
-  });
-
-  element.currentTime = diff / 1000 + skip;
+const handleSynchVideo = (timestamp, skip = 0) => {
+  element.currentTime = getTimeForSync(timestamp, skip);
 };
 
 const handlePassEvent = (event) => {
@@ -167,4 +189,47 @@ const handleYoutubeAutoPause = () => {
       clearInterval(interval);
     }
   }, 50);
+};
+
+const handleSyncYoutube = (timestamp, skip) => {
+  const t = getTimeForSync(timestamp, skip);
+
+  console.log("syncing youtube", t, { timestamp, skip });
+
+  return syncYoutube(t);
+};
+
+const syncYoutube = (timestamp) => {
+  const webview = document.querySelector("webview");
+  if (!webview) return;
+
+  const code = `
+    try {
+      const video = document.querySelector("#player video");
+      if (video) {
+        video.currentTime = ${timestamp};
+      }
+    } catch {};
+  `;
+
+  try {
+    webview.executeJavaScript(code);
+  } catch {}
+};
+
+const handleSendYoutubeTimestamp = async () => {
+  const webview = document.querySelector("webview");
+
+  if (!webview) return;
+
+  const code = `
+    document.querySelector("#player video").currentTime;
+  `;
+
+  let timestamp = 0;
+  try {
+    timestamp = await webview.executeJavaScript(code);
+  } catch {}
+
+  ipcRenderer.send("resInfo", { type: "yt-timestamp", data: timestamp });
 };
