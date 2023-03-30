@@ -43,7 +43,8 @@ if (!gotTheLock) {
 
 const showQuestionnaire = (token) => {
   log.info("show questionnaire for " + token);
-  mainWindow.loadURL(`http://localhost:5173/software/${token}/questionnaire`);
+  // mainWindow.loadURL(`http://localhost:5173/software/${token}/questionnaire`);
+  mainWindow.loadURL(`https://app.3walls.org/software/${token}/questionnaire`);
 };
 
 const focusMainWindow = () => {
