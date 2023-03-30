@@ -10,19 +10,22 @@ const path = require("path");
 const log = require("electron-log");
 const isDev = require("electron-is-dev");
 
-// const api = isDev
-//   ? "http://localhost:5004/api/v1"
-//   : `https://app.3walls.org/api/v1`;
-const api = "https://app.3walls.org/api/v1";
+const api = isDev
+  ? "http://localhost:5004/api/v1"
+  : `https://app.3walls.org/api/v1`;
+//const api = "https://app.3walls.org/api/v1";
 
 class Manager {
   screens = [];
   data = [];
-  token = "";
   ytTimestamps = [];
+  screensEnded = 0;
+  onEnd = () => {};
+  token = "";
 
-  constructor(focusMainWindow) {
+  constructor(focusMainWindow, onEnd) {
     this.focusMainWindow = focusMainWindow;
+    this.onEnd = onEnd;
   }
 
   load(token, isDev) {
@@ -54,7 +57,13 @@ class Manager {
     let windowsLoadedCount = 0;
 
     this.data.map((window, index) => {
-      const newScreen = new Screen(index, window, this.data.length, this.isDev);
+      const newScreen = new Screen(
+        index,
+        window,
+        this.data.length,
+        this.isDev,
+        this.handleScreenEnded.bind(this)
+      );
       this.screens.push(newScreen);
 
       newScreen.window.on("ready-to-show", () => {
@@ -165,6 +174,18 @@ class Manager {
     this.sendEvent("syncYtTimestamps", { skip: avg });
   }
 
+  handleScreenEnded() {
+    this.screensEnded++;
+    if (this.screensEnded === this.screens.length) {
+      // it's a perfect ordert
+      // 1. if mainWindow is not focus - a problem
+      // 2. on reset - the token is gone
+      this.focusMainWindow();
+      this.onEnd(this.token);
+      this.reset();
+    }
+  }
+
   async getData(token) {
     try {
       const res = await axios.get(`${api}/watch/data?token=${token}`);
@@ -185,12 +206,14 @@ class Screen {
   i = -1;
   screensCount = 0;
   toggledPosition = true;
+  onEnd = () => {};
 
-  constructor(pos, data, screensCount, isDev) {
+  constructor(pos, data, screensCount, isDev, onEnd) {
     this.data = data;
     this.pos = pos;
     this.screensCount = screensCount;
     this.isDev = isDev;
+    this.onEnd = onEnd;
     this.createWindow();
   }
 
@@ -282,7 +305,7 @@ class Screen {
 
   next(timestamp = {}) {
     if (this.i >= this.data.length - 1) {
-      // todo : end session
+      this.onEnd();
       return;
     }
     log.info("next");

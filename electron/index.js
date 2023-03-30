@@ -41,6 +41,11 @@ if (!gotTheLock) {
   });
 }
 
+const showQuestionnaire = (token) => {
+  log.info("show questionnaire for " + token);
+  mainWindow.loadURL(`http://localhost:5173/software/${token}/questionnaire`);
+};
+
 const focusMainWindow = () => {
   if (mainWindow) {
     mainWindow.show();
@@ -48,7 +53,7 @@ const focusMainWindow = () => {
   }
 };
 
-const manager = new Manager(focusMainWindow);
+const manager = new Manager(focusMainWindow, showQuestionnaire);
 
 const createWindow = () => {
   mainWindow = new BrowserWindow({
