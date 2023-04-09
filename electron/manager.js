@@ -108,8 +108,8 @@ class Manager {
     });
 
     globalShortcut.register("Escape", () => {
-      this.focusMainWindow();
-      this.reset();
+      this.screensEnded = this.screens.length - 1;
+      this.handleScreenEnded();
     });
 
     if (isDev) {
