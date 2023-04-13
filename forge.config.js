@@ -1,6 +1,6 @@
 module.exports = {
   packagerConfig: {
-    icon: "./public/icon",
+    icon: "public/icon",
     protocols: [
       {
         name: "Threewalls App",
@@ -12,7 +12,7 @@ module.exports = {
   makers: [
     {
       name: "@electron-forge/maker-squirrel",
-      setupIcon: "./public/icon",
+      setupIcon: "public/icon",
     },
     // {
     //   name: "@electron-forge/maker-zip",
