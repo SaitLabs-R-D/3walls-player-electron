@@ -190,7 +190,7 @@ class Manager {
 
       console.log(JSON.stringify(res.data.content, null, 2));
       this.data = this.formatData(res.data.content);
-      console.log(JSON.stringify(this.data, null, 2));
+      // console.log(JSON.stringify(this.data, null, 2));
       // this.initScreens();
     } catch (e) {
       log.error("failed to load data", e);
