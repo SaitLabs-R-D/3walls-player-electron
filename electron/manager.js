@@ -10,7 +10,8 @@ const path = require("path");
 const log = require("electron-log");
 const isDev = require("electron-is-dev");
 
-const api = "https://app.3walls.org/api/v1";
+// const api = "https://app.3walls.org/api/v1";
+const api = "http://localhost:7000/api/v2";
 
 class Manager {
   screens = [];
@@ -187,8 +188,10 @@ class Manager {
     try {
       const res = await axios.get(`${api}/watch/data?token=${token}`);
 
-      this.data = this.formatData(res.data.data);
-      this.initScreens();
+      console.log(JSON.stringify(res.data.content, null, 2));
+      this.data = this.formatData(res.data.content);
+      console.log(JSON.stringify(this.data, null, 2));
+      // this.initScreens();
     } catch (e) {
       log.error("failed to load data", e);
       dialog.showErrorBox(
