@@ -11,7 +11,11 @@ const log = require("electron-log");
 const isDev = require("electron-is-dev");
 
 // const api = "https://app.3walls.org/api/v1";
-const api = "http://localhost:7000/api/v2";
+// const api = "http://localhost:7000/api/v2";
+
+const api = isDev
+  ? "http://localhost:7000/api/v2"
+  : "https://app.3walls.org/api/v2";
 
 class Manager {
   screens = [];
@@ -188,10 +192,8 @@ class Manager {
     try {
       const res = await axios.get(`${api}/watch/data?token=${token}`);
 
-      console.log(JSON.stringify(res.data.content, null, 2));
       this.data = this.formatData(res.data.content);
-      // console.log(JSON.stringify(this.data, null, 2));
-      // this.initScreens();
+      this.initScreens();
     } catch (e) {
       log.error("failed to load data", e);
       dialog.showErrorBox(
