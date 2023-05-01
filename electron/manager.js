@@ -12,7 +12,7 @@ const isDev = require("electron-is-dev");
 
 const API = isDev
   ? "http://localhost:7000/api/v2"
-  : "https://api.3walls.org/api/v2";
+  : "https://api.app.3walls.org/api/v2";
 
 class Manager {
   screens = [];
