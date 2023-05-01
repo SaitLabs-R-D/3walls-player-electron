@@ -10,14 +10,9 @@ const path = require("path");
 const log = require("electron-log");
 const isDev = require("electron-is-dev");
 
-// const api = "https://app.3walls.org/api/v1";
-// const api = "http://localhost:7000/api/v2";
-
-// const api = isDev
-//   ? "http://localhost:7000/api/v2"
-//   : "https://app.3walls.org/api/v2";
-
-const api = "https://api.dev.3walls.org/api/v2";
+const API = isDev
+  ? "http://localhost:7000/api/v2"
+  : "https://api.3walls.org/api/v2";
 
 class Manager {
   screens = [];
@@ -146,7 +141,14 @@ class Manager {
     });
   }
 
-  formatData(data) {
+  formatData(data = []) {
+    if (!Array.isArray(data)) {
+      dialog.showErrorBox(
+        "Error",
+        "Failed to load data, please contact support 420"
+      );
+      return;
+    }
     // ? converts data from vertical to horizontal
 
     data = data.sort((a, b) => a.order - b.order);
@@ -192,11 +194,12 @@ class Manager {
 
   async getData(token) {
     try {
-      const res = await axios.get(`${api}/watch/data?token=${token}`);
+      const res = await axios.get(`${API}/watch/data?token=${token}`);
 
       this.data = this.formatData(res.data.content);
       this.initScreens();
     } catch (e) {
+      console.log(e);
       log.error("failed to load data", e);
       dialog.showErrorBox(
         "Error",

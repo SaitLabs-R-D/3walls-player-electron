@@ -5,6 +5,8 @@ const { Manager } = require("./manager");
 const { Deeplink } = require("electron-deeplink");
 const isDev = require("electron-is-dev");
 
+const WEBSITE = isDev ? "http://localhost:5173" : "https://app.3walls.org";
+
 const log = require("electron-log");
 
 let mainWindow, activateUrl;
@@ -44,7 +46,7 @@ if (!gotTheLock) {
 const showQuestionnaire = (token) => {
   log.info("show questionnaire for " + token);
   // mainWindow.loadURL(`http://localhost:5173/software/${token}/questionnaire`);
-  mainWindow.loadURL(`https://app.3walls.org/software/${token}/questionnaire`);
+  mainWindow.loadURL(`${WEBSITE}/software/${token}/questionnaire`);
 };
 
 const focusMainWindow = () => {
