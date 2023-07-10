@@ -52,7 +52,7 @@ class Manager {
   }
 
   initScreens() {
-    log.info("initiating " + this.screens.length + " screens");
+    log.info("initiating " + this.data.length + " screens");
     let windowsLoadedCount = 0;
 
     this.data.map((window, index) => {
@@ -239,6 +239,8 @@ class Screen {
       },
     });
 
+    log.info("creating window ", this.pos);
+
     this.setPosition();
 
     this.window.loadFile("app/stream/index.html");
@@ -246,6 +248,7 @@ class Screen {
 
   getAllDisplays() {
     const screens = screen.getAllDisplays();
+    log.info(`found ${screens.length} screens`);
     /*
       ?why we sort them?
       screens = [primary, secondary, tertiary]
@@ -261,21 +264,43 @@ class Screen {
     const posIndex = this.toggledPosition ? 2 - this.pos : this.pos;
 
     if (this.isDev) {
-      this.window.setPosition(
-        (scrn[0].workArea.width / this.screensCount) * posIndex, // ? * posIndex, rtl : ltr
-        0
+      const width = Math.floor(scrn[0].workArea.width / this.screensCount);
+      const x = width * posIndex;
+
+      log.info(
+        JSON.stringify(
+          {
+            x: (scrn[0].workArea.width / this.screensCount) * posIndex,
+            y: 0,
+            posIndex,
+            width,
+            height: scrn[0].workArea.height,
+          },
+          null,
+          2
+        )
       );
-      this.window.setSize(
-        scrn[0].workArea.width / this.screensCount,
-        scrn[0].workArea.height
-      );
+
+      this.window.setPosition(x, 0);
+      this.window.setSize(width, scrn[0].workArea.height);
       return;
     }
 
     if (scrn[posIndex]) {
+      log.info(
+        "found scrn[posIndex], setting position",
+        posIndex,
+        scrn[posIndex]
+      );
       this.window.setPosition(scrn[posIndex].workArea.x || 0, 0);
       this.window.setFullScreen(true);
     } else {
+      log.info(
+        "did not find scrn[posIndex], setting position",
+        posIndex,
+        scrn[posIndex]
+      );
+
       this.window.setFullScreen(false);
       this.window.setPosition(scrn[0].workArea.x, 0);
 
