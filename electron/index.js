@@ -5,7 +5,8 @@ const { Manager } = require("./manager");
 const { Deeplink } = require("electron-deeplink");
 const isDev = require("electron-is-dev");
 
-const WEBSITE = isDev ? "http://localhost:5173" : "https://app.3walls.org";
+const WEBSITE = "https://app.3walls.org";
+// isDev ? "http://localhost:5173" :
 
 const log = require("electron-log");
 
