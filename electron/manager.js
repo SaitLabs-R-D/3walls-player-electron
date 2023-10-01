@@ -11,7 +11,7 @@ const log = require("electron-log");
 const isDev = require("electron-is-dev");
 
 const API =
-  // isDev
+  //isDev
   //   ? "http://localhost:7000/api/v2"
   "https://api.app.3walls.org/api/v2";
 
@@ -154,6 +154,8 @@ class Manager {
 
     data = data.sort((a, b) => a.order - b.order);
 
+    console.log(JSON.stringify(data, null, 2));
+
     let newData = [];
 
     for (let i = 0; i < data.length; i++) {
@@ -162,9 +164,24 @@ class Manager {
           newData[j] = [];
         }
 
-        newData[j].push(data[i].screens[j]);
+        switch (data[i].type) {
+          case "panoramic":
+            newData[j].push({
+              url: data[i].gcp_path,
+              type_: "panoramic",
+              mime_type: null,
+              comment: null,
+            });
+            break;
+          case "normal":
+          default:
+            newData[j].push(data[i].screens[j]);
+            break;
+        }
       }
     }
+
+    console.log(JSON.stringify(newData, null, 2));
 
     return newData;
   }
@@ -394,6 +411,7 @@ class Screen {
     this.event("play", {
       type: type_,
       url,
+      screen_idx: this.pos,
       ...payload,
     });
   }

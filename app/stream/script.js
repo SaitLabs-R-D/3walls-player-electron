@@ -1,14 +1,14 @@
 const { ipcRenderer } = require("electron");
 
 const info_div = document.querySelector("#center");
-let element, crrType, crrUrl, crrTimestamp, interval;
+let element, crrType, crrUrl, crrTimestamp, interval, screenIdx;
 
-ipcRenderer.on("play", (_, { type, url, timestamp }) => {
+ipcRenderer.on("play", (_, { type, url, timestamp, screen_idx }) => {
   crrType = type;
   crrUrl = url;
   crrTimestamp = timestamp;
+  screenIdx = screen_idx;
 
-  console.log("play", type, url);
   cleanup();
   setup({ type, url, timestamp });
 });
@@ -72,12 +72,15 @@ function setup({ type, url, timestamp }) {
     }
   } else if (type === "img") {
     element = createImage(url);
+  } else if (type === "panoramic") {
+    element = createPanoramic(url);
   }
 }
 
 function cleanup() {
   element?.remove();
   element = null;
+  delete document.body.dataset.child;
 }
 
 const getTimeForSync = (timestamp, skip = 0) => {
@@ -127,6 +130,22 @@ const createImage = (url) => {
   const img = document.createElement("img");
   img.id = "image";
   img.src = url;
+
+  document.body.appendChild(img);
+
+  return document.getElementById("image");
+};
+
+const createPanoramic = (url) => {
+  document.body.dataset.child = "panoramic";
+
+  const img = document.createElement("img");
+  img.id = "panoramic";
+  img.src = url;
+
+  const left = screenIdx * 100;
+
+  img.style.left = `-${left}%`;
 
   document.body.appendChild(img);
 
