@@ -149,7 +149,7 @@ const createPanoramic = (url) => {
 
   document.body.appendChild(img);
 
-  return document.getElementById("image");
+  return document.getElementById("panoramic");
 };
 
 const isYoutube = (url) => url.includes("youtube") || url.includes("youtu.be");
