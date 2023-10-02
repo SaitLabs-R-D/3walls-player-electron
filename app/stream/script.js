@@ -143,7 +143,7 @@ const createPanoramic = (url) => {
   img.id = "panoramic";
   img.src = url;
 
-  const left = (3 - screenIdx) * 100;
+  const left = (2 - screenIdx) * 100;
 
   img.style.left = `-${left}%`;
 
