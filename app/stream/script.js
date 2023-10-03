@@ -137,17 +137,29 @@ const createImage = (url) => {
 };
 
 const createPanoramic = (url) => {
+  // extract "3walls_file_type" from url
+
+  const urlParams = new URLSearchParams(url);
+  const type = urlParams.get("3walls_file_type");
+
   document.body.dataset.child = "panoramic";
 
-  const img = document.createElement("img");
-  img.id = "panoramic";
-  img.src = url;
+  let tempElement = null;
+
+  if (type === "vid") {
+    tempElement = document.createElement("video");
+  } else {
+    tempElement = document.createElement("img");
+  }
+
+  tempElement.id = "panoramic";
+  tempElement.src = url;
 
   const left = (2 - screenIdx) * 100;
 
-  img.style.left = `-${left}%`;
+  tempElement.style.left = `-${left}%`;
 
-  document.body.appendChild(img);
+  document.body.appendChild(tempElement);
 
   return document.getElementById("panoramic");
 };

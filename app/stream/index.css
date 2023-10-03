@@ -44,7 +44,7 @@ body[data-child="panoramic"] {
   display: none !important;
 }
 
-img#panoramic {
+#panoramic {
   width: 300%;
   height: auto;
 
