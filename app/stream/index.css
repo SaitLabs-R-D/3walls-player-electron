@@ -44,10 +44,6 @@ body[data-child="panoramic"] {
   display: none !important;
 }
 
-#panoramic {
+iframe#panoramic {
   width: 300%;
-  height: auto;
-
-  top: 50%;
-  transform: translateY(-50%);
 }

@@ -138,21 +138,11 @@ const createImage = (url) => {
 
 const createPanoramic = (url) => {
   // extract "3walls_file_type" from url
-  url =
-    "https://www.canva.com/design/DAFwHv9lvxI/5uYh0kzp4qLgxQ_g_xyMnA/view?utm_content=DAFwHv9lvxI&utm_campaign=designshare&utm_medium=link&utm_source=publishsharelink";
-
-  const urlParams = new URLSearchParams(url);
-  const type = urlParams.get("3walls_file_type");
+  url = "https://www.canva.com/design/DAFwNkaxGvU/view";
 
   document.body.dataset.child = "panoramic";
 
-  let tempElement = null;
-
-  if (type === "vid") {
-    tempElement = document.createElement("video");
-  } else {
-    tempElement = document.createElement("img");
-  }
+  const tempElement = document.createElement("iframe");
 
   tempElement.id = "panoramic";
   tempElement.src = url;
