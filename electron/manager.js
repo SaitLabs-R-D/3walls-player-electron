@@ -11,8 +11,8 @@ const log = require("electron-log");
 const isDev = require("electron-is-dev");
 
 // const API = "https://api.dev.3walls.org/api/v2";
-const API = "http://localhost:7000/api/v2";
-// const API = "https://api.app.3walls.org/api/v2";
+// const API = "http://localhost:7000/api/v2";
+const API = "https://api.app.3walls.org/api/v2";
 
 class Manager {
   screens = [];
@@ -91,6 +91,8 @@ class Manager {
     });
 
     globalShortcut.register("CommandOrControl+Space", () => {
+      log.info("pauseOrContinue");
+
       this.sendEvent("pauseOrContinue");
       this.sendEvent("reqInfo", {
         type: "yt-timestamp",
@@ -153,8 +155,6 @@ class Manager {
 
     data = data.sort((a, b) => a.order - b.order);
 
-    console.log(JSON.stringify(data, null, 2));
-
     let newData = [];
 
     for (let i = 0; i < data.length; i++) {
@@ -179,8 +179,6 @@ class Manager {
         }
       }
     }
-
-    console.log(JSON.stringify(newData, null, 2));
 
     return newData;
   }
