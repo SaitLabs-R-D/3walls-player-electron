@@ -21,6 +21,7 @@ class Manager {
   screensEnded = 0;
   onEnd = () => {};
   token = "";
+  floatingMenu = null;
 
   constructor(focusMainWindow, onEnd) {
     this.focusMainWindow = focusMainWindow;
@@ -54,6 +55,8 @@ class Manager {
   initScreens() {
     log.info("initiating " + this.data.length + " screens");
     let windowsLoadedCount = 0;
+
+    this.floatingMenu = new FloatingMenu();
 
     this.data.map((window, index) => {
       const newScreen = new Screen(
@@ -411,6 +414,33 @@ class Screen {
       screen_idx: this.pos,
       ...payload,
     });
+  }
+}
+
+class FloatingMenu {
+  window = null;
+
+  constructor() {
+    this.window = new BrowserWindow({
+      alwaysOnTop: true,
+      autoHideMenuBar: true,
+      width: 500,
+      height: 50,
+      frame: false,
+      resizable: false,
+      movable: true,
+      webPreferences: {
+        nodeIntegration: true,
+        contextIsolation: false,
+      },
+      vibrancy: {
+        theme: "light", // (default) or 'dark' or '#rrggbbaa'
+        effect: "acrylic", // (default) or 'blur'
+        disableOnBlur: true, // (default)
+      },
+    });
+
+    this.window.loadFile("app/menu/index.html");
   }
 }
 
