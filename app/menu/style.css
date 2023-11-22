@@ -1,24 +1,39 @@
 body {
-  background-color: transparent;
-
-  opacity: 0.5;
+  background-color: var(--primary);
 }
 
-.screen {
-  height: 100%;
+body > div {
+  height: 100vh;
+  padding: 6px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
 button {
-  padding-block: 10px;
+  height: 100%;
+  aspect-ratio: 1;
+
   text-align: center;
-  border-radius: 10px;
+  border-radius: 25px;
   border: none;
 
   font-size: 18px;
 
-  box-shadow: 0 0 3px currentColor;
+  box-shadow: 0 0 5px 2px rgb(0, 0, 0, 0.2), inset 0 0 6px 2px rgb(0, 0, 0, 0.2);
 
   background: rgb(52, 152, 219);
+  color: white;
   cursor: pointer;
   font-weight: 600;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+button.drag {
+  -webkit-app-region: drag;
 }

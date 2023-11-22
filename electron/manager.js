@@ -37,6 +37,12 @@ class Manager {
   }
 
   reset() {
+    // not in case of "undefined", just when "false".
+    if (this.floatingMenu?.window.isDestroyed() === false) {
+      this.floatingMenu.window.close();
+      this.floatingMenu = null;
+    }
+
     this.screens.forEach((screen) => {
       if (!screen.window.isDestroyed()) {
         screen.window.close();
@@ -49,7 +55,8 @@ class Manager {
   }
 
   init() {
-    this.hanldeEvents();
+    this.hanldeKeyboardEvents();
+    this.handleMenuEvents();
   }
 
   initScreens() {
@@ -80,44 +87,83 @@ class Manager {
     });
   }
 
-  hanldeEvents() {
-    globalShortcut.register("CommandOrControl+n", () => {
-      this.sendEvent("next");
-    });
+  next() {
+    this.sendEvent("next");
+  }
 
-    globalShortcut.register("CommandOrControl+Tab", () => {
-      this.sendEvent("flipPosition");
-    });
+  prev() {
+    this.sendEvent("prev");
+  }
 
-    globalShortcut.register("CommandOrControl+p", () => {
-      this.sendEvent("prev");
-    });
+  pauseOrContinue() {
+    log.info("pauseOrContinue");
 
-    globalShortcut.register("CommandOrControl+Space", () => {
-      log.info("pauseOrContinue");
-
-      this.sendEvent("pauseOrContinue");
-      this.sendEvent("reqInfo", {
-        type: "yt-timestamp",
-      });
+    this.sendEvent("pauseOrContinue");
+    this.sendEvent("reqInfo", {
+      type: "yt-timestamp",
     });
+  }
 
-    globalShortcut.register("CommandOrControl+Right", () => {
-      this.sendEvent("fastForward", { by: 1 });
-    });
+  flipPosition() {
+    this.sendEvent("flipPosition");
+  }
 
-    globalShortcut.register("CommandOrControl+Left", () => {
-      this.sendEvent("fastForward", { by: -1 });
-    });
+  fastForward(by = 0.0) {
+    this.sendEvent("fastForward", { by });
+  }
 
-    globalShortcut.register("CommandOrControl+f", () => {
-      this.sendEvent("fullscreen");
-    });
+  fullscreen() {
+    this.sendEvent("fullscreen");
+  }
 
-    globalShortcut.register("Escape", () => {
-      this.screensEnded = this.screens.length - 1;
-      this.handleScreenEnded();
+  escape() {
+    this.screensEnded = this.screens.length - 1;
+    this.handleScreenEnded();
+  }
+
+  handleMenuEvents() {
+    ipcMain.on("menu", (_, payload) => {
+      switch (payload.type) {
+        case "next":
+          return this.next();
+        case "prev":
+          return this.prev();
+        case "pauseOrContinue":
+          return this.pauseOrContinue();
+        case "fastForward":
+          return this.fastForward(payload.by);
+        case "fullscreen":
+          return this.fullscreen();
+        // case "flipPosition":
+        //   return this.flipPosition();
+        // case "openDevTools":
+        //   return this.sendEvent("openDevTools");
+        default:
+          return;
+      }
     });
+  }
+
+  hanldeKeyboardEvents() {
+    globalShortcut.register("CommandOrControl+n", this.next);
+
+    globalShortcut.register("CommandOrControl+Tab", this.flipPosition);
+
+    globalShortcut.register("CommandOrControl+p", this.prev);
+
+    globalShortcut.register("CommandOrControl+Space", this.pauseOrContinue);
+
+    globalShortcut.register("CommandOrControl+Right", () =>
+      this.fastForward(1)
+    );
+
+    globalShortcut.register("CommandOrControl+Left", () =>
+      this.fastForward(-1)
+    );
+
+    globalShortcut.register("CommandOrControl+f", this.fullscreen);
+
+    globalShortcut.register("Escape", this.escape);
 
     if (isDev) {
       globalShortcut.register("CommandOrControl+1+2", () => {
@@ -418,25 +464,28 @@ class Screen {
 }
 
 class FloatingMenu {
-  window = null;
-
   constructor() {
+    const primaryScreen = screen.getPrimaryDisplay();
+
+    const width = 500,
+      height = 50;
+
+    const y = primaryScreen.workArea.height - height * 2;
+    const x = primaryScreen.workArea.width / 2 - width / 2;
+
     this.window = new BrowserWindow({
       alwaysOnTop: true,
       autoHideMenuBar: true,
-      width: 500,
-      height: 50,
+      width,
+      height,
+      y,
+      x,
       frame: false,
       resizable: false,
       movable: true,
       webPreferences: {
         nodeIntegration: true,
         contextIsolation: false,
-      },
-      vibrancy: {
-        theme: "light", // (default) or 'dark' or '#rrggbbaa'
-        effect: "acrylic", // (default) or 'blur'
-        disableOnBlur: true, // (default)
       },
     });
 
