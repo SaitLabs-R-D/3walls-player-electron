@@ -39,13 +39,13 @@ const send = (type, payload) => {
 const setCan = (newCan) => {
   Object.assign(can, newCan);
 
-  buttons.forEach((button) => {
-    if (button.className === "pauseOrContinue") {
-      button.disabled = !can.pauseOrContinue;
-    } else if (button.className === "move") {
-      button.disabled = !can.move[button.id];
-    } else if (button.className === "fastForward") {
-      button.disabled = !can.fastForward[button.id];
-    }
-  });
+  // buttons.forEach((button) => {
+  //   if (button.className === "pauseOrContinue") {
+  //     button.disabled = !can.pauseOrContinue;
+  //   } else if (button.className === "move") {
+  //     button.disabled = !can.move[button.id];
+  //   } else if (button.className === "fastForward") {
+  //     button.disabled = !can.fastForward[button.id];
+  //   }
+  // });
 };

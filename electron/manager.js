@@ -22,7 +22,7 @@ class Manager {
   onEnd = () => {};
   token = "";
   floatingMenu = null;
-  idx = 0;
+  idx = -1;
 
   constructor(focusMainWindow, onEnd) {
     this.focusMainWindow = focusMainWindow;
@@ -89,12 +89,12 @@ class Manager {
   }
 
   next() {
-    this.floatingMenu?.setCan(this.data, ++this.idx);
+    this.floatingMenu?.setCan(this.data[++this.idx], this.idx);
     this.sendEvent("next");
   }
 
   prev() {
-    this.floatingMenu?.setCan(this.data, --this.idx);
+    this.floatingMenu?.setCan(this.data[--this.idx], this.idx);
     this.sendEvent("prev");
   }
 
@@ -150,13 +150,15 @@ class Manager {
   }
 
   hanldeKeyboardEvents() {
-    globalShortcut.register("CommandOrControl+n", this.next);
+    globalShortcut.register("CommandOrControl+n", () => this.next());
 
-    globalShortcut.register("CommandOrControl+Tab", this.flipPosition);
+    globalShortcut.register("CommandOrControl+Tab", () => this.flipPosition());
 
-    globalShortcut.register("CommandOrControl+p", this.prev);
+    globalShortcut.register("CommandOrControl+p", () => this.prev());
 
-    globalShortcut.register("CommandOrControl+Space", this.pauseOrContinue);
+    globalShortcut.register("CommandOrControl+Space", () =>
+      this.pauseOrContinue()
+    );
 
     globalShortcut.register("CommandOrControl+Right", () =>
       this.fastForward(1)
@@ -166,9 +168,9 @@ class Manager {
       this.fastForward(-1)
     );
 
-    globalShortcut.register("CommandOrControl+f", this.fullscreen);
+    globalShortcut.register("CommandOrControl+f", () => this.fullscreen());
 
-    globalShortcut.register("Escape", this.escape);
+    globalShortcut.register("Escape", () => this.escape());
 
     if (isDev) {
       globalShortcut.register("CommandOrControl+1+2", () => {
@@ -472,7 +474,7 @@ class FloatingMenu {
   constructor() {
     const primaryScreen = screen.getPrimaryDisplay();
 
-    const width = 500,
+    const width = 350,
       height = 50;
 
     const y = primaryScreen.workArea.height - height * 2;
@@ -485,9 +487,9 @@ class FloatingMenu {
       height,
       y,
       x,
-      frame: true,
-      resizable: true,
-      movable: true,
+      frame: false,
+      resizable: false,
+      movable: false,
       webPreferences: {
         nodeIntegration: true,
         contextIsolation: false,
@@ -495,11 +497,11 @@ class FloatingMenu {
     });
 
     this.window.loadFile("app/menu/index.html");
-
-    this.window.webContents.openDevTools();
   }
 
-  setCan(screens, idx) {
+  setCan(data = [], idx) {
+    console.log({ data, idx });
+
     const can = {
       pauseOrContinue: false,
       move: {
@@ -516,7 +518,6 @@ class FloatingMenu {
       can.move.prev = true;
     }
 
-    const data = screens[idx] ?? [];
     for (const screen of data) {
       if (screen.type_ === "video") {
         can.pauseOrContinue = true;
@@ -524,6 +525,8 @@ class FloatingMenu {
         can.fastForward[1] = true;
       }
     }
+
+    console.log({ can });
 
     this.window.webContents.send("can", can);
   }
