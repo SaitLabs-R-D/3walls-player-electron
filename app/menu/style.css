@@ -20,13 +20,9 @@ button {
   border-radius: 25px;
   border: none;
 
-  font-size: 18px;
-
   box-shadow: 0 0 5px 2px rgb(0, 0, 0, 0.2), inset 0 0 6px 2px rgb(0, 0, 0, 0.2);
 
   background: rgb(52, 152, 219);
-  color: white;
-  cursor: pointer;
   font-weight: 600;
 
   display: flex;
@@ -34,6 +30,17 @@ button {
   justify-content: center;
 }
 
+button,
+button svg {
+  cursor: pointer;
+  font-size: 18px;
+  color: white;
+}
+
 button.drag {
   -webkit-app-region: drag;
+}
+
+button:disabled {
+  opacity: 0.3;
 }

@@ -22,6 +22,7 @@ class Manager {
   onEnd = () => {};
   token = "";
   floatingMenu = null;
+  idx = 0;
 
   constructor(focusMainWindow, onEnd) {
     this.focusMainWindow = focusMainWindow;
@@ -88,10 +89,12 @@ class Manager {
   }
 
   next() {
+    this.floatingMenu?.setCan(this.data, ++this.idx);
     this.sendEvent("next");
   }
 
   prev() {
+    this.floatingMenu?.setCan(this.data, --this.idx);
     this.sendEvent("prev");
   }
 
@@ -124,6 +127,8 @@ class Manager {
   handleMenuEvents() {
     ipcMain.on("menu", (_, payload) => {
       switch (payload.type) {
+        case "esc":
+          return this.escape();
         case "next":
           return this.next();
         case "prev":
@@ -480,8 +485,8 @@ class FloatingMenu {
       height,
       y,
       x,
-      frame: false,
-      resizable: false,
+      frame: true,
+      resizable: true,
       movable: true,
       webPreferences: {
         nodeIntegration: true,
@@ -490,6 +495,37 @@ class FloatingMenu {
     });
 
     this.window.loadFile("app/menu/index.html");
+
+    this.window.webContents.openDevTools();
+  }
+
+  setCan(screens, idx) {
+    const can = {
+      pauseOrContinue: false,
+      move: {
+        next: true,
+        prev: false,
+      },
+      fastForward: {
+        "-1": false,
+        1: false,
+      },
+    };
+
+    if (idx > -1) {
+      can.move.prev = true;
+    }
+
+    const data = screens[idx] ?? [];
+    for (const screen of data) {
+      if (screen.type_ === "video") {
+        can.pauseOrContinue = true;
+        can.fastForward["-1"] = true;
+        can.fastForward[1] = true;
+      }
+    }
+
+    this.window.webContents.send("can", can);
   }
 }
 
