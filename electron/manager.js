@@ -10,9 +10,9 @@ const path = require("path");
 const log = require("electron-log");
 const isDev = require("electron-is-dev");
 
-// const API = "https://api.dev.3walls.org/api/v2";
+const API = "https://api.dev.3walls.org/api/v2";
 // const API = "http://localhost:7000/api/v2";
-const API = "https://api.app.3walls.org/api/v2";
+// const API = "https://api.app.3walls.org/api/v2";
 
 class Manager {
   screens = [];
