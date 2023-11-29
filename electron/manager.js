@@ -56,6 +56,7 @@ class Manager {
   }
 
   init() {
+    this.next();
     this.hanldeKeyboardEvents();
     this.handleMenuEvents();
   }
@@ -64,7 +65,7 @@ class Manager {
     log.info("initiating " + this.data.length + " screens");
     let windowsLoadedCount = 0;
 
-    this.floatingMenu = new FloatingMenu();
+    this.floatingMenu = new FloatingMenu(this.dataByPart);
 
     this.data.map((window, index) => {
       const newScreen = new Screen(
@@ -89,12 +90,12 @@ class Manager {
   }
 
   next() {
-    this.floatingMenu?.setCan(this.data[++this.idx], this.idx);
+    this.floatingMenu?.setIdx(++this.idx);
     this.sendEvent("next");
   }
 
   prev() {
-    this.floatingMenu?.setCan(this.data[--this.idx], this.idx);
+    this.floatingMenu?.setIdx(--this.idx);
     this.sendEvent("prev");
   }
 
@@ -211,17 +212,18 @@ class Manager {
 
     data = data.sort((a, b) => a.order - b.order);
 
-    let newData = [];
+    const dataByScreen = [];
+    const dataByPart = [];
 
     for (let i = 0; i < data.length; i++) {
       for (let j = 0; j < data[i].screens.length; j++) {
-        if (!newData[j]) {
-          newData[j] = [];
+        if (!dataByScreen[j]) {
+          dataByScreen[j] = [];
         }
 
         switch (data[i].type) {
           case "panoramic":
-            newData[j].push({
+            dataByScreen[j].push({
               url: data[i].gcp_path ?? data[i].panoramic_url,
               type_: "panoramic",
               mime_type: null,
@@ -230,13 +232,18 @@ class Manager {
             break;
           case "normal":
           default:
-            newData[j].push(data[i].screens[j]);
+            dataByScreen[j].push(data[i].screens[j]);
             break;
         }
       }
     }
 
-    return newData;
+    for (let i = 0; i < data.length; i++) {
+      dataByPart.push(data[i].screens);
+    }
+
+    this.dataByPart = dataByPart;
+    this.data = dataByScreen;
   }
 
   handleSyncYtTimestamps(payload) {
@@ -267,7 +274,7 @@ class Manager {
     try {
       const res = await axios.get(`${API}/watch/data?token=${token}`);
 
-      this.data = this.formatData(res.data.content);
+      this.formatData(res.data.content);
       this.initScreens();
     } catch (e) {
       console.log(e);
@@ -471,7 +478,22 @@ class Screen {
 }
 
 class FloatingMenu {
-  constructor() {
+  data = [];
+  idx = -1;
+
+  constructor(data) {
+    this.data = data;
+
+    this.#init();
+  }
+
+  setIdx(idx) {
+    this.idx = idx;
+
+    this.#sendCan();
+  }
+
+  #init() {
     const primaryScreen = screen.getPrimaryDisplay();
 
     const width = 350,
@@ -489,7 +511,7 @@ class FloatingMenu {
       x,
       frame: false,
       resizable: false,
-      movable: false,
+      movable: true,
       webPreferences: {
         nodeIntegration: true,
         contextIsolation: false,
@@ -499,14 +521,12 @@ class FloatingMenu {
     this.window.loadFile("app/menu/index.html");
   }
 
-  setCan(data = [], idx) {
-    console.log({ data, idx });
-
+  #sendCan() {
     const can = {
       pauseOrContinue: false,
       move: {
         next: true,
-        prev: false,
+        prev: Boolean(this.idx),
       },
       fastForward: {
         "-1": false,
@@ -514,19 +534,13 @@ class FloatingMenu {
       },
     };
 
-    if (idx > -1) {
-      can.move.prev = true;
-    }
-
-    for (const screen of data) {
+    for (const screen of this.data[this.idx] ?? []) {
       if (screen.type_ === "video") {
         can.pauseOrContinue = true;
         can.fastForward["-1"] = true;
         can.fastForward[1] = true;
       }
     }
-
-    console.log({ can });
 
     this.window.webContents.send("can", can);
   }

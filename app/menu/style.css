@@ -28,6 +28,8 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
+
+  transition: scale 0.2s ease-in-out;
 }
 
 button,
@@ -41,6 +43,6 @@ button.drag {
   -webkit-app-region: drag;
 }
 
-button:disabled {
-  opacity: 0.3;
+button:active {
+  scale: 0.85;
 }
