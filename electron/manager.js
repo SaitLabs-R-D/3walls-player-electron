@@ -162,11 +162,11 @@ class Manager {
     );
 
     globalShortcut.register("CommandOrControl+Right", () =>
-      this.fastForward(1)
+      this.fastForward(10)
     );
 
     globalShortcut.register("CommandOrControl+Left", () =>
-      this.fastForward(-1)
+      this.fastForward(-10)
     );
 
     globalShortcut.register("CommandOrControl+f", () => this.fullscreen());
@@ -496,7 +496,7 @@ class FloatingMenu {
   #init() {
     const primaryScreen = screen.getPrimaryDisplay();
 
-    const width = 350,
+    const width = 750,
       height = 50;
 
     const y = primaryScreen.workArea.height - height * 2;

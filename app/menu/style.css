@@ -14,7 +14,11 @@ body > div {
 
 button {
   height: 100%;
-  aspect-ratio: 1;
+  /* aspect-ratio: 1; */
+  padding-inline: 14px;
+  font-family: "Open Sans", sans-serif;
+  font-size: 14px !important;
+  white-space: nowrap;
 
   text-align: center;
   border-radius: 25px;
