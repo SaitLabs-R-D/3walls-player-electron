@@ -2,6 +2,7 @@ import path from "path";
 import { APP_ICON_PATH, SCREENS_COUNT } from "../../../constants";
 import { BrowserWindow, screen } from "electron";
 import { loadApp } from "../helpers";
+import { LessonContent } from "../../shared/types";
 
 export class Part {
   public window: BrowserWindow;
@@ -15,11 +16,14 @@ export class Part {
   }
 
   public destroy() {
-    this.window.destroy();
+    if (this.window && !this.window.isDestroyed()) {
+      this.window.destroy();
+      this.window = null;
+    }
   }
 
-  public render() {
-    //
+  public paint(type: string, content: LessonContent) {
+    this.window.webContents.send("paint", { type, content });
   }
 
   private createWindow() {
@@ -44,6 +48,8 @@ export class Part {
     });
 
     this.setPosition();
+
+    this.window.webContents.openDevTools();
   }
 
   private setPosition() {

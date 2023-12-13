@@ -53,12 +53,17 @@ function handleStartLesson(payload: PreviewSubmitTokenPayload) {
   player.loadLesson(payload.token, payload.devMode);
 }
 
+function showQuestionnaire() {
+  player.reset();
+  preview.focus();
+}
+
 //==================//
 //      Events      //
 //==================//
 
 const preview = new Preview();
-const player = new Player();
+const player = new Player(showQuestionnaire);
 
 // app.on("open-url", () => {
 //   dialog.showErrorBox(

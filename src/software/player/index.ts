@@ -5,6 +5,7 @@ import {
   Action,
   FunctionizedAction,
   LessonData,
+  LessonPart,
   LessonRawData,
 } from "../../shared/types";
 import { Part } from "./part";
@@ -14,13 +15,23 @@ import { functionize } from "../../shared/utils";
 import { actions } from "./config";
 
 export class Player {
+  private isPlaying = false;
+
   private data: LessonData = [];
   private rawData: LessonRawData = [];
   private screens: Part[] = [];
   private devMode: boolean;
   private floatingMenu: FloatingMenu;
-  private idx = 0;
   private showQuestionnaire: () => void;
+
+  private idx = 0;
+  get getIdx() {
+    return this.idx;
+  }
+  set setIdx(idx: number) {
+    this.idx = idx;
+    this.play();
+  }
 
   constructor(showQuestionnaire: () => void) {
     this.showQuestionnaire = showQuestionnaire;
@@ -35,18 +46,29 @@ export class Player {
   }
 
   public reset() {
+    this.isPlaying = false;
+
     for (const screen of this.screens) {
       screen.destroy();
     }
 
-    this.floatingMenu.destroy();
+    if (this.floatingMenu) {
+      this.floatingMenu.destroy();
+      this.floatingMenu = null;
+    }
+
+    this.screens = [];
     this.rawData = [];
     this.data = [];
+    this.idx = 0;
   }
 
   private init() {
-    // this.floatingMenu = new FloatingMenu(this.fireAction.bind(this));
+    this.isPlaying = true;
+
+    this.floatingMenu = new FloatingMenu(this.fireAction.bind(this));
     this.registerKeybinds();
+    this.play();
   }
 
   private loadScreens() {
@@ -91,6 +113,30 @@ export class Player {
   }
 
   //==================//
+  //       Play       //
+  //==================//
+
+  private play() {
+    const part = this.data[this.idx];
+
+    this.screens.forEach((screen, screenIdx) => {
+      switch (part.type) {
+        case "normal":
+          screen.paint(
+            part.type,
+            (part as LessonPart<"normal">).content[screenIdx]
+          );
+          break;
+        case "panoramic":
+          screen.paint(part.type, (part as LessonPart<"panoramic">).content);
+          break;
+        default:
+          break;
+      }
+    });
+  }
+
+  //==================//
   //       Events     //
   //==================//
 
@@ -113,19 +159,25 @@ export class Player {
   //==================//
 
   private onEscape() {
-    this.reset();
+    this.showQuestionnaire();
   }
 
   private onNext() {
-    if (++this.idx === this.data.length) {
-      this.reset();
-      this.showQuestionnaire();
+    console.log("onNext", this.idx);
+
+    if (this.idx === this.data.length - 1) {
+      // this.showQuestionnaire();
+      return;
     }
+
+    this.setIdx = this.idx + 1;
   }
 
   private onPrev() {
+    console.log("onPrev", this.idx, this.idx > 0);
+
     if (this.idx > 0) {
-      this.idx--;
+      this.setIdx = this.idx - 1;
     }
   }
 

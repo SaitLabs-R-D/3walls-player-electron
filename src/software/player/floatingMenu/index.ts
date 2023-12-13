@@ -15,7 +15,10 @@ export class FloatingMenu {
   }
 
   public destroy() {
-    this.window.destroy();
+    if (this.window && !this.window.isDestroyed()) {
+      this.window.destroy();
+      this.window = null;
+    }
   }
 
   public createWindow() {

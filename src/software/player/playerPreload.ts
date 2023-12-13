@@ -10,6 +10,11 @@ const API: PlayerAPI = {
       callback(screenIdx);
     });
   },
+  onPaint: (callback) => {
+    ipcRenderer.on("paint", (_, payload) => {
+      callback(payload);
+    });
+  },
 };
 
 contextBridge.exposeInMainWorld("ipcRenderer", API);

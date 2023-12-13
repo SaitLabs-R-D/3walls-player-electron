@@ -30,8 +30,10 @@ export class Preview {
   }
 
   public destroy() {
-    this.window.destroy();
-    this.window = null;
+    if (this.window && !this.window.isDestroyed()) {
+      this.window.destroy();
+      this.window = null;
+    }
   }
 
   public minimize() {

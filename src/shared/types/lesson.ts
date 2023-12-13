@@ -22,18 +22,19 @@ export type LessonPart<T = LessonPartType> = {
   order: number;
   title: string;
   type: T;
-
-  content: T extends "normal"
-    ? LessonPartNormalContent
-    : LessonPartPanoramicContent;
+  content: LessonContent<T>;
 };
+
+export type LessonContent<T = LessonPartType> = T extends "normal"
+  ? LessonPartNormalContent[]
+  : LessonPartPanoramicContent;
 
 export type LessonPartNormalContent = {
   url: string;
   type_: LessonPartNormalScreenType;
   mime_type: string;
   comment: string;
-}[];
+};
 
 export type LessonPartPanoramicContent = {
   url: string;
