@@ -1,12 +1,21 @@
-import { BrowserWindow, screen } from "electron";
+import { BrowserWindow, ipcMain, screen } from "electron";
 import { loadApp } from "../../helpers";
 import path from "path";
+import { Action } from "../../../shared/types";
+import { actions } from "../config";
 
 export class FloatingMenu {
   private window: BrowserWindow;
+  private fireAction: (action: Action) => void;
 
-  constructor() {
+  constructor(fireAction: (action: Action) => void) {
+    this.fireAction = fireAction;
     this.createWindow();
+    this.listen();
+  }
+
+  public destroy() {
+    this.window.destroy();
   }
 
   public createWindow() {
@@ -29,7 +38,7 @@ export class FloatingMenu {
       resizable: false,
       movable: true,
       webPreferences: {
-        preload: path.join(__dirname, "playerPreload.js"),
+        preload: path.join(__dirname, "floatingMenuPreload.js"),
         nodeIntegration: true,
         contextIsolation: true,
       },
@@ -40,5 +49,13 @@ export class FloatingMenu {
       FLOATINGMENU_VITE_NAME,
       FLOATINGMENU_VITE_DEV_SERVER_URL
     );
+  }
+
+  private listen() {
+    actions.forEach((action) => {
+      ipcMain.on(action.name, () => {
+        this.fireAction(action.name);
+      });
+    });
   }
 }

@@ -1,9 +1,17 @@
 import axios from "axios";
 import log from "electron-log";
 import { API_URL, SCREENS_COUNT } from "../../../constants";
-import { LessonData, LessonRawData } from "../../shared/types";
+import {
+  Action,
+  FunctionizedAction,
+  LessonData,
+  LessonRawData,
+} from "../../shared/types";
 import { Part } from "./part";
 import { FloatingMenu } from "./floatingMenu";
+import { globalShortcut } from "electron";
+import { functionize } from "../../shared/utils";
+import { actions } from "./config";
 
 export class Player {
   private data: LessonData = [];
@@ -11,6 +19,12 @@ export class Player {
   private screens: Part[] = [];
   private devMode: boolean;
   private floatingMenu: FloatingMenu;
+  private idx = 0;
+  private showQuestionnaire: () => void;
+
+  constructor(showQuestionnaire: () => void) {
+    this.showQuestionnaire = showQuestionnaire;
+  }
 
   public async loadLesson(token: string, devMode: boolean) {
     this.devMode = devMode;
@@ -25,12 +39,14 @@ export class Player {
       screen.destroy();
     }
 
+    this.floatingMenu.destroy();
     this.rawData = [];
     this.data = [];
   }
 
   private init() {
-    this.floatingMenu = new FloatingMenu();
+    // this.floatingMenu = new FloatingMenu(this.fireAction.bind(this));
+    this.registerKeybinds();
   }
 
   private loadScreens() {
@@ -72,5 +88,60 @@ export class Player {
     } catch (e) {
       log.error("failed to load data", e);
     }
+  }
+
+  //==================//
+  //       Events     //
+  //==================//
+
+  private registerKeybinds() {
+    actions.forEach((action) => {
+      globalShortcut.register(action.keybinds, () =>
+        this.fireAction(action.name)
+      );
+    });
+  }
+
+  private fireAction(action: Action) {
+    const func = functionize(action) as FunctionizedAction;
+
+    this[func]();
+  }
+
+  //==================//
+  //      Actions     //
+  //==================//
+
+  private onEscape() {
+    this.reset();
+  }
+
+  private onNext() {
+    if (++this.idx === this.data.length) {
+      this.reset();
+      this.showQuestionnaire();
+    }
+  }
+
+  private onPrev() {
+    if (this.idx > 0) {
+      this.idx--;
+    }
+  }
+
+  private onVideoPauseOrContinue() {
+    console.log("onVideoPauseOrContinue");
+  }
+
+  private onVideoRewind() {
+    console.log("onVideoRewind");
+  }
+
+  private onVideoForward() {
+    console.log("onVideoForward");
+  }
+
+  private onVideoFullscreen() {
+    console.log("onVideoFullscreen");
   }
 }
