@@ -3,3 +3,6 @@
 // whether you're running in development or production).
 declare const PREVIEW_VITE_DEV_SERVER_URL: string;
 declare const PREVIEW_VITE_NAME: string;
+
+declare const PLAYER_VITE_DEV_SERVER_URL: string;
+declare const PLAYER_VITE_NAME: string;

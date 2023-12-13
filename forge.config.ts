@@ -4,9 +4,17 @@ import { MakerZIP } from "@electron-forge/maker-zip";
 import { MakerDeb } from "@electron-forge/maker-deb";
 import { MakerRpm } from "@electron-forge/maker-rpm";
 import { VitePlugin } from "@electron-forge/plugin-vite";
+import { APP_PREFIX } from "./constants";
 
 const config: ForgeConfig = {
-  packagerConfig: {},
+  packagerConfig: {
+    protocols: [
+      {
+        name: "3-Walls App",
+        schemes: [APP_PREFIX],
+      },
+    ],
+  },
   rebuildConfig: {},
   makers: [
     new MakerSquirrel({}),
@@ -25,7 +33,11 @@ const config: ForgeConfig = {
           config: "vite.main.config.ts",
         },
         {
-          entry: "src/software/preload.ts",
+          entry: "src/software/preview/previewPreload.ts",
+          config: "vite.preload.config.ts",
+        },
+        {
+          entry: "src/software/player/playerPreload.ts",
           config: "vite.preload.config.ts",
         },
       ],
@@ -33,6 +45,10 @@ const config: ForgeConfig = {
         {
           name: "preview",
           config: "vite.renderer.preview.config.ts",
+        },
+        {
+          name: "player",
+          config: "vite.renderer.player.config.ts",
         },
       ],
     }),

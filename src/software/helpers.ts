@@ -1,7 +1,15 @@
 import { BrowserWindow } from "electron";
 import path from "path";
 
-export const createMainWindow = () => {
+export const loadApp = (window: BrowserWindow, name: string, url: string) => {
+  if (url) {
+    window.loadURL(url);
+  } else {
+    window.loadFile(path.join(__dirname, `../renderer/${name}/index.html`));
+  }
+};
+
+export const createPreviewWindow = () => {
   // Create the browser window.
   const window = new BrowserWindow({
     width: 800,
@@ -16,14 +24,7 @@ export const createMainWindow = () => {
     },
   });
 
-  // and load the index.html of the app.
-  if (PREVIEW_VITE_DEV_SERVER_URL) {
-    window.loadURL(PREVIEW_VITE_DEV_SERVER_URL);
-  } else {
-    window.loadFile(
-      path.join(__dirname, `../renderer/${PREVIEW_VITE_NAME}/index.html`)
-    );
-  }
+  loadApp(window, PREVIEW_VITE_NAME, PREVIEW_VITE_DEV_SERVER_URL);
 
   return window;
 };

@@ -1,9 +1,13 @@
-import { app, BrowserWindow, dialog } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
 import path from "path";
-import { APP_PREFIX } from "./constants";
-import { createMainWindow, focusWindow } from "./helpers";
+import { APP_PREFIX } from "../../constants";
+import { Preview } from "./preview";
+import { PreviewSubmitTokenPayload } from "../shared/types";
+import { Player } from "./player";
 
-let mainWindow: BrowserWindow | null = null;
+//==================//
+//      Setup       //
+//==================//
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
@@ -27,25 +31,44 @@ if (!gotTheLock) {
 } else {
   app.on("second-instance", () => {
     // Someone tried to run a second instance, we should focus our window.
-    focusWindow(mainWindow);
+    preview.focus();
   });
 }
 
+//==================//
+//      Main        //
+//==================//
+
 async function init() {
-  mainWindow = createMainWindow();
+  preview.load();
 }
 
-app.on("open-url", () => {
-  dialog.showErrorBox(
-    "Protocol handler",
-    "This app doesn't handle opening URLs."
-  );
-});
-app.on("second-instance", () => {
-  dialog.showErrorBox(
-    "Protocol handler",
-    "This app doesn't handle opening URLs."
-  );
+function handlePreviewSendURL(url: string) {
+  preview.focus();
+  preview.sendURL(url);
+}
+
+function handleStartLesson(payload: PreviewSubmitTokenPayload) {
+  preview.minimize();
+  player.loadLesson(payload.token, payload.devMode);
+}
+
+//==================//
+//      Events      //
+//==================//
+
+const preview = new Preview();
+const player = new Player();
+
+// app.on("open-url", () => {
+//   dialog.showErrorBox(
+//     "Protocol handler",
+//     "This app doesn't handle opening URLs."
+//   );
+// });
+
+app.on("second-instance", (_, commandLine) => {
+  handlePreviewSendURL(commandLine.pop());
 });
 
 // This method will be called when Electron has finished
@@ -66,9 +89,10 @@ app.on("activate", () => {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {
-    createMainWindow();
+    init();
   }
 });
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.
+ipcMain.on("start", (_event, payload: PreviewSubmitTokenPayload) =>
+  handleStartLesson(payload)
+);
