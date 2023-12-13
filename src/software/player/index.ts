@@ -3,12 +3,14 @@ import log from "electron-log";
 import { API_URL, SCREENS_COUNT } from "../../../constants";
 import { LessonData, LessonRawData } from "../../shared/types";
 import { Part } from "./part";
+import { FloatingMenu } from "./floatingMenu";
 
 export class Player {
   private data: LessonData = [];
   private rawData: LessonRawData = [];
   private screens: Part[] = [];
   private devMode: boolean;
+  private floatingMenu: FloatingMenu;
 
   public async loadLesson(token: string, devMode: boolean) {
     this.devMode = devMode;
@@ -28,7 +30,7 @@ export class Player {
   }
 
   private init() {
-    // pass
+    this.floatingMenu = new FloatingMenu();
   }
 
   private loadScreens() {

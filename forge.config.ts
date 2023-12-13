@@ -40,6 +40,10 @@ const config: ForgeConfig = {
           entry: "src/software/player/playerPreload.ts",
           config: "vite.preload.config.ts",
         },
+        {
+          entry: "src/software/player/floatingMenu/floatingMenuPreload.ts",
+          config: "vite.preload.config.ts",
+        },
       ],
       renderer: [
         {
@@ -49,6 +53,10 @@ const config: ForgeConfig = {
         {
           name: "player",
           config: "vite.renderer.player.config.ts",
+        },
+        {
+          name: "floatingMenu",
+          config: "vite.renderer.floatingMenu.config.ts",
         },
       ],
     }),

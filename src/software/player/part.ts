@@ -12,11 +12,6 @@ export class Part {
     this.screenIdx = screenIdx;
     this.devMode = devMode;
     this.createWindow();
-
-    setTimeout(() => {
-      this.window.webContents.send("setup", screenIdx);
-      this.window.webContents.openDevTools();
-    }, 1000);
   }
 
   public destroy() {
@@ -43,6 +38,10 @@ export class Part {
     });
 
     loadApp(this.window, PLAYER_VITE_NAME, PLAYER_VITE_DEV_SERVER_URL);
+
+    this.window.on("ready-to-show", () => {
+      this.window.webContents.send("setup", this.screenIdx);
+    });
 
     this.setPosition();
   }
