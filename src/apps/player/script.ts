@@ -3,6 +3,7 @@ import {
   PlayerOnPaintPayload,
   PlayerWindow,
 } from "../../shared/types";
+import { isYoutube } from "../../shared/utils";
 
 //==================//
 //     Constants    //
@@ -10,6 +11,8 @@ import {
 
 const crrPaint: {
   element?: HTMLElement;
+  elementType?: "img" | "video" | "browser" | "panoramic";
+  isYoutube?: boolean;
 } = {};
 
 const setup = {
@@ -21,9 +24,16 @@ const setup = {
 //==================//
 
 function paint(payload: PlayerOnPaintPayload) {
-  if (payload.type === "panoramic") return;
+  if (payload.type === "panoramic") {
+    crrPaint.elementType = "panoramic";
+    crrPaint.element = paintPanoramicImage(payload.content.url);
+
+    return;
+  }
 
   const content = payload.content as LessonPartNormalContent;
+
+  crrPaint.elementType = content.type_;
 
   switch (content.type_) {
     case "img":
@@ -34,41 +44,21 @@ function paint(payload: PlayerOnPaintPayload) {
       break;
     case "browser":
       crrPaint.element = paintWebview(content.url);
+      crrPaint.isYoutube = isYoutube(content.url);
       break;
     default:
       break;
   }
 }
 
-//==================//
-//      Events      //
-//==================//
-
-window.addEventListener("DOMContentLoaded", () => {
-  const win = window as PlayerWindow;
-
-  // win.ipcRenderer.onSetup((screenIdx) => {
-  //   setup.screenIdx = screenIdx;
-
-  //   document.body.innerHTML = screenIdx + "";
-  // });
-
-  win.ipcRenderer.onPaint((payload) => {
-    cleanup();
-    console.log(payload);
-    paint(payload);
-  });
-});
-
-//==================//
-//     Adapters     //
-//==================//
-
 function cleanup() {
-  if (crrPaint.element) {
-    document.body.removeChild(crrPaint.element);
-    crrPaint.element = undefined;
-  }
+  if (!crrPaint.element) return;
+
+  delete document.body.dataset.child;
+  document.body.removeChild(crrPaint.element);
+  crrPaint.element = null;
+  crrPaint.elementType = null;
+  crrPaint.isYoutube = null;
 }
 
 function paintImage(URL: string) {
@@ -99,4 +89,71 @@ function paintWebview(URL: string) {
   return element;
 }
 
-// function paintPanoramic() {}
+function paintPanoramicImage(URL: string) {
+  const element = paintImage(URL);
+
+  document.body.dataset.child = "panoramic";
+
+  element.style.position = "absolute";
+  element.style.width = "300%";
+  element.style.left = `-${setup.screenIdx * 100}%`;
+
+  return element;
+}
+
+//==================//
+//      Events      //
+//==================//
+
+window.addEventListener("DOMContentLoaded", () => {
+  const win = window as PlayerWindow;
+
+  win.ipcRenderer.onSetup((screenIdx) => {
+    setup.screenIdx = screenIdx;
+  });
+
+  win.ipcRenderer.onPaint((payload) => {
+    cleanup();
+    console.log(payload);
+    paint(payload);
+  });
+
+  win.ipcRenderer.onVideoPauseOrContinue((payload) => {
+    console.log("onVideoPauseOrContinue", payload);
+
+    if (crrPaint.isYoutube) return;
+
+    if (crrPaint.elementType !== "video") return;
+
+    const element = crrPaint.element as HTMLVideoElement;
+
+    // syncVideo(element, payload.at, payload.timestamp);
+
+    if (element.paused) {
+      element.play();
+    } else {
+      element.pause();
+    }
+  });
+
+  win.ipcRenderer.onVideoSeekTo((payload) => {
+    if (crrPaint.elementType !== "video") return;
+
+    const element = crrPaint.element as HTMLVideoElement;
+
+    // !temporary!!!
+    element.currentTime += payload;
+  });
+});
+
+//==================//
+//     Adapters     //
+//==================//
+
+// function syncVideo(video: HTMLVideoElement, at: number, timestamp: number) {
+//   const now = Date.now();
+//   const diff = now - at;
+//   console.log(timestamp);
+//   // timestamp += diff;
+//   // video.currentTime = timestamp / 1000;
+// }

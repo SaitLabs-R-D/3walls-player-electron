@@ -10,7 +10,7 @@ export class Part {
   private devMode: boolean;
 
   constructor(screenIdx: number, devMode = false) {
-    this.screenIdx = screenIdx;
+    this.screenIdx = SCREENS_COUNT - screenIdx - 1;
     this.devMode = devMode;
     this.createWindow();
   }

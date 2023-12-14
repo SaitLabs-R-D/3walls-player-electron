@@ -26,7 +26,7 @@ export const actions: Actions = [
     keybinds: "CommandOrControl+Right",
   },
   {
-    name: "videoFullscreen",
+    name: "videoToggleFullscreen",
     keybinds: "CommandOrControl+f",
   },
 ];

@@ -6,11 +6,23 @@ import {
 
 export type PlayerAPI = {
   onSetup: (callback: PlayerOnSetup) => void;
-  onPaint: (callback: onPaint) => void;
+  onPaint: (callback: PlayerOnPaint) => void;
+  onVideoPauseOrContinue: (callback: PlayerOnVideoPauseOrContinue) => void;
+  onVideoSeekTo: (callback: PlayerOnSeekTo) => void;
+  onVideoToggleFullscreen: (callback: () => void) => void;
 };
 
 export type PlayerOnSetup = (screenIdx: number) => void;
-export type onPaint = (payload: PlayerOnPaintPayload) => void;
+export type PlayerOnPaint = (payload: PlayerOnPaintPayload) => void;
+export type PlayerOnVideoPauseOrContinue = (
+  payload: PlayerOnSeekToPayload
+) => void;
+export type PlayerOnSeekTo = (payload: PlayerOnSeekToPayload) => void;
+
+export type PlayerOnSeekToPayload = {
+  at: number;
+  timestamp: number;
+};
 
 export type PlayerOnPaintPayload<T = LessonPartType> = {
   type: T;
@@ -31,8 +43,15 @@ export type Action =
   | "videoPauseOrContinue"
   | "videoRewind"
   | "videoForward"
-  | "videoFullscreen"
-  | "videoFullscreen";
+  | "videoToggleFullscreen";
+
+export type RendererAction =
+  | "escape"
+  | "next"
+  | "prev"
+  | "videoPauseOrContinue"
+  | "videoSeekTo"
+  | "videoToggleFullscreen";
 
 export type FunctionizedAction = `on${Capitalize<Action>}`;
 

@@ -15,6 +15,21 @@ const API: PlayerAPI = {
       callback(payload);
     });
   },
+  onVideoPauseOrContinue: (callback) => {
+    ipcRenderer.on("videoPauseOrContinue", (_, timestamp) => {
+      callback(timestamp);
+    });
+  },
+  onVideoSeekTo: (callback) => {
+    ipcRenderer.on("videoSeekTo", (_, payload) => {
+      callback(payload);
+    });
+  },
+  onVideoToggleFullscreen: (callback) => {
+    ipcRenderer.on("videoToggleFullscreen", () => {
+      callback();
+    });
+  },
 };
 
 contextBridge.exposeInMainWorld("ipcRenderer", API);

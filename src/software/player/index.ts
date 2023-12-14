@@ -7,12 +7,14 @@ import {
   LessonData,
   LessonPart,
   LessonRawData,
+  RendererAction,
 } from "../../shared/types";
 import { Part } from "./part";
 import { FloatingMenu } from "./floatingMenu";
 import { globalShortcut } from "electron";
 import { functionize } from "../../shared/utils";
 import { actions } from "./config";
+import { Video } from "./adapters";
 
 export class Player {
   private isPlaying = false;
@@ -23,6 +25,8 @@ export class Player {
   private devMode: boolean;
   private floatingMenu: FloatingMenu;
   private showQuestionnaire: () => void;
+
+  private video = new Video();
 
   private idx = 0;
   get getIdx() {
@@ -57,6 +61,7 @@ export class Player {
       this.floatingMenu = null;
     }
 
+    this.video.reset();
     this.screens = [];
     this.rawData = [];
     this.data = [];
@@ -87,7 +92,7 @@ export class Player {
   }
 
   private formatData(rawData: LessonRawData = this.rawData) {
-    for (const rawLesson of rawData) {
+    for (const rawLesson of rawData.sort((a, b) => a.order - b.order)) {
       const content =
         rawLesson.type === "normal"
           ? rawLesson.screens
@@ -154,6 +159,12 @@ export class Player {
     this[func]();
   }
 
+  private sendAction(action: RendererAction, payload?: any) {
+    this.screens.forEach((screen) => {
+      screen.window.webContents.send(action, payload);
+    });
+  }
+
   //==================//
   //      Actions     //
   //==================//
@@ -174,26 +185,26 @@ export class Player {
   }
 
   private onPrev() {
-    console.log("onPrev", this.idx, this.idx > 0);
-
     if (this.idx > 0) {
       this.setIdx = this.idx - 1;
     }
   }
 
   private onVideoPauseOrContinue() {
-    console.log("onVideoPauseOrContinue");
+    this.sendAction("videoPauseOrContinue", this.video.togglePlay());
   }
 
   private onVideoRewind() {
-    console.log("onVideoRewind");
+    // this.sendAction("videoSeekTo", this.video.skipBy(-10));
+    this.sendAction("videoSeekTo", -10);
   }
 
   private onVideoForward() {
-    console.log("onVideoForward");
+    // this.sendAction("videoSeekTo", this.video.skipBy(10));
+    this.sendAction("videoSeekTo", 10);
   }
 
-  private onVideoFullscreen() {
-    console.log("onVideoFullscreen");
+  private onVideoToggleFullscreen() {
+    this.sendAction("videoToggleFullscreen");
   }
 }

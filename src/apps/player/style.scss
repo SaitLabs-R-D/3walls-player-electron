@@ -2,13 +2,19 @@ body {
   margin: 0;
   padding: 0;
 
-  background-color: black;
+  position: relative;
 
   height: 100vh;
 
   display: flex;
   flex-direction: column;
   justify-content: center;
+
+  overflow: hidden;
+
+  &[data-child="panoramic"] {
+    background-color: black;
+  }
 
   img,
   video,
