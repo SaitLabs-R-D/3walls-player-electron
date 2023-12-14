@@ -54,8 +54,9 @@ function handleStartLesson(payload: PreviewSubmitTokenPayload) {
 }
 
 function showQuestionnaire() {
-  player.reset();
+  preview.loadQuestionnaire(player.token);
   preview.focus();
+  player.reset();
 }
 
 //==================//

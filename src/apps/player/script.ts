@@ -121,7 +121,11 @@ window.addEventListener("DOMContentLoaded", () => {
   win.ipcRenderer.onVideoPauseOrContinue((payload) => {
     console.log("onVideoPauseOrContinue", payload);
 
-    if (crrPaint.isYoutube) return;
+    if (crrPaint.isYoutube) {
+      const element = crrPaint.element as Electron.WebviewTag;
+      element.sendInputEvent({ type: "keyDown", keyCode: "space" });
+      return;
+    }
 
     if (crrPaint.elementType !== "video") return;
 
@@ -142,7 +146,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const element = crrPaint.element as HTMLVideoElement;
 
     // !temporary!!!
-    element.currentTime += payload;
+    element.currentTime += payload as unknown as number;
   });
 });
 
@@ -150,10 +154,10 @@ window.addEventListener("DOMContentLoaded", () => {
 //     Adapters     //
 //==================//
 
-// function syncVideo(video: HTMLVideoElement, at: number, timestamp: number) {
-//   const now = Date.now();
-//   const diff = now - at;
-//   console.log(timestamp);
-//   // timestamp += diff;
-//   // video.currentTime = timestamp / 1000;
-// }
+function syncVideo(video: HTMLVideoElement, at: number, timestamp: number) {
+  const now = Date.now();
+  const diff = now - at;
+  console.log(timestamp);
+  // timestamp += diff;
+  // video.currentTime = timestamp / 1000;
+}

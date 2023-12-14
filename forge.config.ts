@@ -8,6 +8,7 @@ import { APP_PREFIX } from "./constants";
 
 const config: ForgeConfig = {
   packagerConfig: {
+    icon: "./public/icon.ico",
     protocols: [
       {
         name: "3-Walls App",
@@ -17,10 +18,12 @@ const config: ForgeConfig = {
   },
   rebuildConfig: {},
   makers: [
-    new MakerSquirrel({}),
-    new MakerZIP({}, ["darwin"]),
-    new MakerRpm({}),
-    new MakerDeb({}),
+    new MakerSquirrel({
+      setupIcon: "./public/icon.ico",
+    }),
+    // new MakerZIP({}, ["darwin"]),
+    // new MakerRpm({}),
+    // new MakerDeb({}),
   ],
   plugins: [
     new VitePlugin({

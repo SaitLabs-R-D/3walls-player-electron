@@ -17,6 +17,7 @@ import { actions } from "./config";
 import { Video } from "./adapters";
 
 export class Player {
+  public token: string;
   private isPlaying = false;
 
   private data: LessonData = [];
@@ -43,6 +44,7 @@ export class Player {
 
   public async loadLesson(token: string, devMode: boolean) {
     this.devMode = devMode;
+    this.token = token;
 
     await this.fetchData(token);
     this.formatData();
@@ -61,6 +63,7 @@ export class Player {
       this.floatingMenu = null;
     }
 
+    this.token = null;
     this.video.reset();
     this.screens = [];
     this.rawData = [];
@@ -151,6 +154,12 @@ export class Player {
         this.fireAction(action.name)
       );
     });
+
+    globalShortcut.register("CommandOrControl+1+2", () => {
+      this.screens.forEach((screen) => {
+        screen.window.webContents.openDevTools();
+      });
+    });
   }
 
   private fireAction(action: Action) {
@@ -174,10 +183,8 @@ export class Player {
   }
 
   private onNext() {
-    console.log("onNext", this.idx);
-
     if (this.idx === this.data.length - 1) {
-      // this.showQuestionnaire();
+      this.showQuestionnaire();
       return;
     }
 

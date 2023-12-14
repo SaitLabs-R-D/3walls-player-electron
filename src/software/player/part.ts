@@ -1,6 +1,6 @@
 import path from "path";
 import { APP_ICON_PATH, SCREENS_COUNT } from "../../../constants";
-import { BrowserWindow, screen } from "electron";
+import { BrowserWindow, ipcMain, screen } from "electron";
 import { loadApp } from "../helpers";
 import { LessonContent } from "../../shared/types";
 
@@ -38,6 +38,7 @@ export class Part {
         nodeIntegration: true,
         contextIsolation: true,
         webviewTag: true,
+        javascript: true,
       },
     });
 
@@ -48,8 +49,6 @@ export class Part {
     });
 
     this.setPosition();
-
-    this.window.webContents.openDevTools();
   }
 
   private setPosition() {

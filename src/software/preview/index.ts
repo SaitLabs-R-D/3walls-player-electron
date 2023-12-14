@@ -1,7 +1,7 @@
 import { BrowserWindow } from "electron";
 import { loadApp } from "../helpers";
 import path from "path";
-import { APP_ICON_PATH, APP_PREFIX } from "../../../constants";
+import { APP_ICON_PATH, APP_PREFIX, WEBSITE_URL } from "../../../constants";
 
 export class Preview {
   private window: BrowserWindow;
@@ -51,5 +51,9 @@ export class Preview {
     const token = url.replace(`${APP_PREFIX}://`, "").replaceAll("/", "");
 
     this.window.webContents.send("token", token);
+  }
+
+  public loadQuestionnaire(token: string) {
+    this.window.loadURL(`${WEBSITE_URL}/software/${token}/questionnaire`);
   }
 }
