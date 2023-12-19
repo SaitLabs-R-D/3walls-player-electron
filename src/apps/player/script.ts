@@ -123,7 +123,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     if (crrPaint.isYoutube) {
       const element = crrPaint.element as Electron.WebviewTag;
-      element.sendInputEvent({ type: "keyDown", keyCode: "space" });
+      // element.sendInputEvent({ type: "keyDown", keyCode: "space" });
       return;
     }
 

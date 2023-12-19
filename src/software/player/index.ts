@@ -30,10 +30,8 @@ export class Player {
   private video = new Video();
 
   private idx = 0;
-  get getIdx() {
-    return this.idx;
-  }
-  set setIdx(idx: number) {
+
+  private set setIdx(idx: number) {
     this.idx = idx;
     this.play();
   }
@@ -69,6 +67,12 @@ export class Player {
     this.rawData = [];
     this.data = [];
     this.idx = 0;
+
+    actions.forEach((action) => {
+      globalShortcut.unregister(action.keybinds);
+    });
+
+    globalShortcut.unregister("CommandOrControl+1+2");
   }
 
   private init() {

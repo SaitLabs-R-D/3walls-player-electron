@@ -34,6 +34,7 @@ export class Part {
       center: true,
       icon: APP_ICON_PATH,
       webPreferences: {
+        devTools: true,
         preload: path.join(__dirname, "playerPreload.js"),
         nodeIntegration: true,
         contextIsolation: true,
