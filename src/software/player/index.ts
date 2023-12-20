@@ -18,7 +18,7 @@ import { Video } from "./adapters";
 
 export class Player {
   public token: string;
-  private isPlaying = false;
+  public isPlaying = false;
 
   private data: LessonData = [];
   private rawData: LessonRawData = [];

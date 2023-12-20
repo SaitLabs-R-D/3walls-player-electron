@@ -4,6 +4,7 @@ import path from "path";
 import { APP_ICON_PATH, APP_PREFIX, WEBSITE_URL } from "../../../constants";
 
 export class Preview {
+  public isQuestionnaireOpen = false;
   private window: BrowserWindow;
 
   public createWindow() {
@@ -36,6 +37,8 @@ export class Preview {
       this.window.destroy();
       this.window = null;
     }
+
+    this.isQuestionnaireOpen = false;
   }
 
   public minimize() {
@@ -57,5 +60,6 @@ export class Preview {
 
   public loadQuestionnaire(token: string) {
     this.window.loadURL(`${WEBSITE_URL}/software/${token}/questionnaire`);
+    this.isQuestionnaireOpen = true;
   }
 }

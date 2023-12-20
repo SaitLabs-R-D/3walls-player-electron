@@ -44,10 +44,15 @@ async function init() {
   preview.loadPreviewApp();
 }
 
-function handlePreviewSendURL(url: string) {
-  preview.loadPreviewApp();
+function handlePreviewSendURL(URL: string) {
+  if (player.isPlaying) return;
+
+  if (preview.isQuestionnaireOpen) {
+    preview.loadPreviewApp();
+  }
+
   preview.focus();
-  preview.sendURL(url);
+  preview.sendURL(URL);
 }
 
 function handleStartLesson(payload: PreviewSubmitTokenPayload) {
