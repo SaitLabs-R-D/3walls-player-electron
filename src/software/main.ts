@@ -40,10 +40,12 @@ if (!gotTheLock) {
 //==================//
 
 async function init() {
-  preview.load();
+  preview.createWindow();
+  preview.loadPreviewApp();
 }
 
 function handlePreviewSendURL(url: string) {
+  preview.loadPreviewApp();
   preview.focus();
   preview.sendURL(url);
 }

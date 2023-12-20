@@ -6,7 +6,7 @@ import { APP_ICON_PATH, APP_PREFIX, WEBSITE_URL } from "../../../constants";
 export class Preview {
   private window: BrowserWindow;
 
-  public load() {
+  public createWindow() {
     this.window = new BrowserWindow({
       width: 800,
       height: 600,
@@ -20,13 +20,15 @@ export class Preview {
       },
     });
 
-    loadApp(this.window, PREVIEW_VITE_NAME, PREVIEW_VITE_DEV_SERVER_URL);
-
     this.window.on("closed", () => {
       this.window = null;
     });
 
     this.window.webContents.on("did-fail-load", this.destroy);
+  }
+
+  public loadPreviewApp() {
+    loadApp(this.window, PREVIEW_VITE_NAME, PREVIEW_VITE_DEV_SERVER_URL);
   }
 
   public destroy() {
