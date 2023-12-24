@@ -5,6 +5,7 @@ const API: FloatingMenuAPI = {
   escape: () => ipcRenderer.send("escape"),
   next: () => ipcRenderer.send("next"),
   prev: () => ipcRenderer.send("prev"),
+  videoToggleFullscreen: () => ipcRenderer.send("videoToggleFullscreen"),
   videoPauseOrContinue: () => ipcRenderer.send("videoPauseOrContinue"),
   videoRewind: () => ipcRenderer.send("videoRewind"),
   videoForward: () => ipcRenderer.send("videoForward"),
