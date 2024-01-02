@@ -57,6 +57,7 @@ export class Player {
     }
 
     if (this.floatingMenu) {
+      console.log(`\nreset floatingMenu\n`);
       this.floatingMenu.destroy();
       this.floatingMenu = null;
     }

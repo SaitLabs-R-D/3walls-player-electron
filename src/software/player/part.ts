@@ -29,9 +29,6 @@ export class Part {
   private createWindow() {
     this.window = new BrowserWindow({
       autoHideMenuBar: true,
-      width: 500,
-      height: 500,
-      center: true,
       icon: APP_ICON_PATH,
       webPreferences: {
         devTools: true,
@@ -75,7 +72,7 @@ export class Part {
     /*
       ?why we sort them?
       screens = [primary, secondary, tertiary]
-      and not [right, center, left] (or reversed)
+      and not [right, center, left] (nor reversed)
       so we sort them by their x position
     */
     return screens.sort((a, b) => a.bounds.x - b.bounds.x);

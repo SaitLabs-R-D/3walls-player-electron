@@ -8,6 +8,7 @@ export class FloatingMenu {
   public isShown = false;
   private window: BrowserWindow;
   private fireAction: (action: Action) => void;
+  private interval: NodeJS.Timeout;
 
   constructor(fireAction: (action: Action) => void) {
     this.fireAction = fireAction;
@@ -20,11 +21,13 @@ export class FloatingMenu {
   }
 
   public destroy() {
+    console.log(`\ndestroy\n`);
     if (this.window && !this.window.isDestroyed()) {
       this.isShown = false;
       this.window.destroy();
       this.window = null;
       this.unlisten();
+      clearInterval(this.interval);
     }
   }
 
@@ -47,6 +50,8 @@ export class FloatingMenu {
       x,
       frame: false,
       resizable: false,
+      minimizable: false,
+      closable: false,
       movable: true,
       webPreferences: {
         preload: path.join(__dirname, "floatingMenuPreload.js"),
@@ -57,7 +62,7 @@ export class FloatingMenu {
 
     // check if the window is destroyed
     this.window.on("closed", () => {
-      console.log("\n\n\n\nclosed\n\n\n\n");
+      console.log(`\nclosed ${this.isShown}\n`);
       if (this.isShown) {
         this.createWindow();
       }
@@ -65,21 +70,27 @@ export class FloatingMenu {
 
     // check if minimized
     this.window.on("minimize", () => {
-      console.log("\n\n\n\nminimize\n\n\n\n");
+      console.log("\nminimize\n");
       if (this.isShown) {
         this.window.restore();
       }
     });
 
     this.window.webContents.on("render-process-gone", () => {
-      console.log("\n\n\n\nrender-process-gone\n\n\n\n");
+      console.log("\nrender-process-gone\n");
       if (this.isShown) {
         this.createWindow();
       }
     });
 
-    this.window.setMinimizable(false);
-    this.window.setClosable(false);
+    this.interval = setInterval(() => {
+      console.log(
+        "\ninterval\n",
+        this.window.isDestroyed(),
+        this.window.isAlwaysOnTop()
+      );
+      this.window.setAlwaysOnTop(true);
+    }, 1000);
 
     loadApp(
       this.window,

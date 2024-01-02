@@ -12,9 +12,7 @@ body {
 
   overflow: hidden;
 
-  &[data-child="panoramic"] {
-    background-color: black;
-  }
+  background-color: black;
 
   img,
   video,
