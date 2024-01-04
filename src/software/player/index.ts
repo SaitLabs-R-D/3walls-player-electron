@@ -96,6 +96,10 @@ export class Player {
           this.init();
         }
       });
+
+      screen.window.on("closed", () => {
+        this.showQuestionnaire();
+      });
     }
   }
 

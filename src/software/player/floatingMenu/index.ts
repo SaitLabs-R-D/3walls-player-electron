@@ -8,7 +8,6 @@ export class FloatingMenu {
   public isShown = false;
   private window: BrowserWindow;
   private fireAction: (action: Action) => void;
-  private interval: NodeJS.Timeout;
 
   constructor(fireAction: (action: Action) => void) {
     this.fireAction = fireAction;
@@ -27,7 +26,6 @@ export class FloatingMenu {
       this.window.destroy();
       this.window = null;
       this.unlisten();
-      clearInterval(this.interval);
     }
   }
 
@@ -76,21 +74,26 @@ export class FloatingMenu {
       }
     });
 
+    // if not topmost, bring to front
+    this.window.on("always-on-top-changed", () => {
+      console.log(`\nalways-on-top-changed\n`);
+      if (!this.window.isAlwaysOnTop()) {
+        this.window.setAlwaysOnTop(true, "screen-saver");
+      }
+    });
+
+    this.window.on("blur", () => {
+      console.log(`\nblur\n`);
+      if (this.isShown) {
+        this.window.focus();
+      }
+    });
+
     this.window.webContents.on("render-process-gone", () => {
-      console.log("\nrender-process-gone\n");
       if (this.isShown) {
         this.createWindow();
       }
     });
-
-    this.interval = setInterval(() => {
-      console.log(
-        "\ninterval\n",
-        this.window.isDestroyed(),
-        this.window.isAlwaysOnTop()
-      );
-      this.window.setAlwaysOnTop(true);
-    }, 1000);
 
     loadApp(
       this.window,
