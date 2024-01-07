@@ -1,0 +1,50 @@
+@import "../root.scss";
+
+body > div {
+  height: 100vh;
+  padding: 6px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+button {
+  height: 100%;
+  /* aspect-ratio: 1; */
+  padding-inline: 14px;
+  font-family: "Open Sans", sans-serif;
+  font-size: 14px !important;
+  white-space: nowrap;
+
+  text-align: center;
+  border-radius: 25px;
+  border: none;
+
+  box-shadow: 0 0 5px 2px rgb(0, 0, 0, 0.2), inset 0 0 6px 2px rgb(0, 0, 0, 0.2);
+
+  background: rgb(52, 152, 219);
+  font-weight: 600;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: scale 0.2s ease-in-out;
+}
+
+button,
+button svg {
+  cursor: pointer;
+  font-size: 18px;
+  color: white;
+}
+
+button.drag {
+  -webkit-app-region: drag;
+}
+
+button:active {
+  scale: 0.85;
+}

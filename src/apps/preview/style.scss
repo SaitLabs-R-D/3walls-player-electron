@@ -1,0 +1,79 @@
+@import "../root.scss";
+
+body {
+  min-height: 100vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 35px;
+}
+
+.logo {
+  display: grid;
+  place-items: center;
+}
+
+.logo img {
+  width: min(80%, 350px);
+}
+
+.form {
+  width: min(500px, 80%);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: 15px;
+}
+
+input {
+  color: rgb(26, 33, 43) !important;
+}
+
+input,
+button.start {
+  padding-block: 10px;
+  text-align: center;
+  border-radius: 10px;
+  border: none;
+
+  font-size: 18px;
+  font-weight: 300;
+
+  box-shadow: 0 0 3px currentColor;
+}
+
+button {
+  color: $primary-color;
+
+  &.start {
+    background-color: $accent;
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  &.dev {
+    border: none;
+    background: transparent;
+    text-decoration: underline;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+}
+
+input {
+  &:placeholder-shown ~ button {
+    display: none;
+  }
+  &:placeholder-shown ~ p {
+    display: inline-block;
+  }
+}
+
+p {
+  display: none;
+  font-size: 14px;
+  text-align: center;
+}
