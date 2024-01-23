@@ -77,3 +77,88 @@ p {
   font-size: 14px;
   text-align: center;
 }
+
+.intl_wrapper {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+
+  .intl {
+    position: relative;
+    width: 120px;
+
+    &:not(:hover, :focus-within) .intl__dropdown {
+      display: none;
+    }
+
+    &__circle {
+      background-color: unset;
+      border: unset;
+
+      position: relative;
+
+      height: 35px;
+      width: 35px;
+
+      cursor: pointer;
+
+      img {
+        object-fit: cover;
+        border-radius: 50%;
+        width: 100%;
+        height: 100%;
+      }
+
+      &::after {
+        content: "";
+
+        width: 0;
+        height: 0;
+
+        margin-inline-start: 5px;
+        border-top: 5px solid white;
+
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+      }
+    }
+
+    &__dropdown {
+      display: flex;
+      flex-direction: column;
+
+      background-color: $secondary;
+      border-radius: 1rem;
+      overflow: hidden;
+
+      &__item {
+        background-color: unset;
+        border: unset;
+
+        height: 35px;
+        padding-inline: 10px;
+
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        cursor: pointer;
+
+        &:hover {
+          background-color: $accent;
+        }
+
+        span {
+          color: $primary-color;
+          font-size: 12px;
+        }
+
+        img {
+          width: 30px;
+          height: auto;
+          object-fit: contain;
+        }
+      }
+    }
+  }
+}

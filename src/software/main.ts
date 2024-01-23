@@ -4,6 +4,8 @@ import { APP_PREFIX } from "../../constants";
 import { Preview } from "./preview";
 import { PreviewSubmitTokenPayload } from "../shared/types";
 import { Player } from "./player";
+import { Lang } from "../shared/types/general";
+import { store } from "./store";
 
 //==================//
 //      Setup       //
@@ -109,3 +111,8 @@ app.on("activate", () => {
 ipcMain.on("start", (_event, payload: PreviewSubmitTokenPayload) =>
   handleStartLesson(payload)
 );
+
+ipcMain.on("intl", (_event, lang: Lang) => {
+  console.log(store.lang);
+  store.setLang(lang);
+});

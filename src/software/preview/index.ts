@@ -2,6 +2,7 @@ import { BrowserWindow } from "electron";
 import { loadApp } from "../helpers";
 import path from "path";
 import { APP_ICON_PATH, APP_PREFIX, WEBSITE_URL } from "../../../constants";
+import { store } from "../store";
 
 export class Preview {
   public isQuestionnaireOpen = false;
@@ -26,6 +27,13 @@ export class Preview {
     });
 
     this.window.webContents.on("did-fail-load", this.destroy);
+
+    this.window.webContents.on("did-finish-load", () => {
+      this.window.webContents.send("lang", store.lang);
+      store.addListener("preview", (lang) => {
+        this.window.webContents.send("lang", lang);
+      });
+    });
   }
 
   public loadPreviewApp() {
@@ -36,6 +44,7 @@ export class Preview {
     if (this.window && !this.window.isDestroyed()) {
       this.window.destroy();
       this.window = null;
+      store.removeListener("preview");
     }
 
     this.isQuestionnaireOpen = false;

@@ -3,6 +3,7 @@ import { loadApp } from "../../helpers";
 import path from "path";
 import { Action } from "../../../shared/types";
 import { actions } from "../config";
+import { store } from "../../../software/store";
 
 export class FloatingMenu {
   public isShown = false;
@@ -93,6 +94,13 @@ export class FloatingMenu {
       if (this.isShown) {
         this.createWindow();
       }
+    });
+
+    this.window.webContents.on("did-finish-load", () => {
+      this.window.webContents.send("lang", store.lang);
+      store.addListener("floatingMenu", (lang) => {
+        this.window.webContents.send("lang", lang);
+      });
     });
 
     loadApp(
