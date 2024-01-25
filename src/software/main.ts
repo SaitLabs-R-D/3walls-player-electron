@@ -30,11 +30,6 @@ const gotTheLock = app.requestSingleInstanceLock();
 
 if (!gotTheLock) {
   app.quit();
-} else {
-  app.on("second-instance", () => {
-    // Someone tried to run a second instance, we should focus our window.
-    preview.focus();
-  });
 }
 
 //==================//
@@ -62,7 +57,7 @@ function handleStartLesson(payload: PreviewSubmitTokenPayload) {
   player.loadLesson(payload.token, payload.devMode);
 }
 
-function showQuestionnaire() {
+function handleShowQuestionnaire() {
   preview.loadQuestionnaire(player.token);
   preview.focus();
   player.reset();
@@ -73,7 +68,7 @@ function showQuestionnaire() {
 //==================//
 
 const preview = new Preview();
-const player = new Player(showQuestionnaire);
+const player = new Player(handleShowQuestionnaire);
 
 // app.on("open-url", () => {
 //   dialog.showErrorBox(
@@ -113,6 +108,5 @@ ipcMain.on("start", (_event, payload: PreviewSubmitTokenPayload) =>
 );
 
 ipcMain.on("intl", (_event, lang: Lang) => {
-  console.log(store.lang);
   store.setLang(lang);
 });

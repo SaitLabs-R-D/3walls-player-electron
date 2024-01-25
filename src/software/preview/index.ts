@@ -1,5 +1,5 @@
 import { BrowserWindow } from "electron";
-import { loadApp } from "../helpers";
+import { focusWindow, loadApp } from "../helpers";
 import path from "path";
 import { APP_ICON_PATH, APP_PREFIX, WEBSITE_URL } from "../../../constants";
 import { store } from "../store";
@@ -43,10 +43,10 @@ export class Preview {
   public destroy() {
     if (this.window && !this.window.isDestroyed()) {
       this.window.destroy();
-      this.window = null;
-      store.removeListener("preview");
     }
 
+    this.window = null;
+    store.removeListener("preview");
     this.isQuestionnaireOpen = false;
   }
 
@@ -55,10 +55,7 @@ export class Preview {
   }
 
   public focus() {
-    if (this.window.isMinimized()) this.window.restore();
-
-    this.window.show();
-    this.window.focus();
+    focusWindow(this.window);
   }
 
   public sendURL(url: string) {

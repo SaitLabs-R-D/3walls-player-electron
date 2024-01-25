@@ -1,6 +1,6 @@
 // copied from this library cuz it's really short
 // https://www.npmjs.com/package/electron-is-dev
-//https://github.com/sindresorhus/electron-is-dev/blob/main/index.js
+// https://github.com/sindresorhus/electron-is-dev/blob/main/index.js
 
 import electron from "electron";
 

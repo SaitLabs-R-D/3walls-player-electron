@@ -145,7 +145,8 @@ window.addEventListener("DOMContentLoaded", () => {
 
     const element = crrPaint.element as HTMLVideoElement;
 
-    // !temporary!!!
+    // should use the `syncVideo` function here, and use the payload properly
+    // !temporary!
     element.currentTime += payload as unknown as number;
   });
 });
@@ -155,6 +156,13 @@ window.addEventListener("DOMContentLoaded", () => {
 //==================//
 
 function syncVideo(video: HTMLVideoElement, at: number, timestamp: number) {
+  /*
+    The variables basically tell us:
+    "on 13:00:00 you should be at 00:00:00"
+    so we can calculate the drift, and fix it, for example:
+    "on 13:00:00 you should be at 00:00:00, but now it's 13:00:01, so you should be at 00:00:01"
+  */
+
   const now = Date.now();
   const diff = now - at;
   console.log(timestamp);
