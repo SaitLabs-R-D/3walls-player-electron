@@ -35,7 +35,7 @@ window.addEventListener("DOMContentLoaded", () => {
   win.ipcRenderer.onLangChange((lang) => {
     (
       document.querySelector(".intl__circle > img") as HTMLImageElement
-    ).src = `./intl/${lang}.webp`;
+    ).src = `${lang}.webp`;
 
     input.placeholder = dictionary[lang].placeholder;
     startButton.innerText = dictionary[lang].startBtn;
