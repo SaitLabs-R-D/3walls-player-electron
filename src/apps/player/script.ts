@@ -96,6 +96,7 @@ function paintPanoramicImage(URL: string) {
 
   element.style.position = "absolute";
   element.style.width = "300%";
+  //                             0/1/2
   element.style.left = `-${setup.screenIdx * 100}%`;
 
   return element;

@@ -29,6 +29,7 @@ export class Preview {
     this.window.webContents.on("did-fail-load", this.destroy);
 
     this.window.webContents.on("did-finish-load", () => {
+      this.window.webContents.openDevTools();
       this.window.webContents.send("lang", store.lang);
       store.addListener("preview", (lang) => {
         this.window.webContents.send("lang", lang);
