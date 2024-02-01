@@ -7,7 +7,8 @@ const buttons = document.querySelectorAll(
 
 buttons.forEach((button) => {
   button.addEventListener("click", () => {
-    if (button.className in win.ipcRenderer) {
+    console.log(button.className);
+    if (button.className in win.ipcRenderer.actions) {
       const cls = button.className as keyof ActionsInAPI;
       win.ipcRenderer.actions[cls]();
     }

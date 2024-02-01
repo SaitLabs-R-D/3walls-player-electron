@@ -45,6 +45,7 @@ export class Player {
     this.token = token;
 
     await this.fetchData(token);
+
     this.formatData();
     this.loadScreens();
   }
@@ -135,8 +136,6 @@ export class Player {
   //==================//
 
   private play() {
-    console.log(this.data, this.idx, this.data[this.idx]);
-
     const part = this.data[this.idx];
 
     if (!part) return;
@@ -178,6 +177,8 @@ export class Player {
 
   private fireAction(action: Action) {
     const func = functionize(action) as FunctionizedAction;
+
+    console.log(`\nfireAction: ${func}\n`);
 
     this[func]();
   }

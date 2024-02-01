@@ -47,8 +47,8 @@ export class FloatingMenu {
       height,
       y,
       x,
-      frame: false,
-      resizable: false,
+      // frame: false,
+      // resizable: false,
       minimizable: false,
       closable: false,
       movable: true,
@@ -83,13 +83,6 @@ export class FloatingMenu {
       }
     });
 
-    this.window.on("blur", () => {
-      console.log(`\nblur\n`);
-      if (this.isShown) {
-        this.window.focus();
-      }
-    });
-
     this.window.webContents.on("render-process-gone", () => {
       if (this.isShown) {
         this.createWindow();
@@ -97,6 +90,7 @@ export class FloatingMenu {
     });
 
     this.window.webContents.on("did-finish-load", () => {
+      this.window.webContents.openDevTools();
       this.window.webContents.send("locale", store.locale);
       store.addListener("floatingMenu", (locale) => {
         this.window.webContents.send("locale", locale);

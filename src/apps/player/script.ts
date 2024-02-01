@@ -3,7 +3,7 @@ import {
   PlayerOnPaintPayload,
   PlayerWindow,
 } from "../../shared/types";
-import { isYoutube } from "../../shared/utils";
+import { getGCPURLVideoOrImage, isYoutube } from "../../shared/utils";
 
 //==================//
 //     Constants    //
@@ -11,7 +11,8 @@ import { isYoutube } from "../../shared/utils";
 
 const crrPaint: {
   element?: HTMLElement;
-  elementType?: "img" | "video" | "browser" | "panoramic";
+  partType?: "normal" | "panoramic";
+  elementType?: "img" | "video" | "browser";
   isYoutube?: boolean;
 } = {};
 
@@ -25,14 +26,21 @@ const setup = {
 
 function paint(payload: PlayerOnPaintPayload) {
   if (payload.type === "panoramic") {
-    crrPaint.elementType = "panoramic";
-    crrPaint.element = paintPanoramicImage(payload.content.url);
+    crrPaint.partType = "panoramic";
+
+    const type = getGCPURLVideoOrImage(payload.content.url);
+    if (type == "image") {
+      crrPaint.element = paintPanoramicImage(payload.content.url);
+    } else if (type == "video") {
+      crrPaint.element = paintPanoramicVideo(payload.content.url);
+    }
 
     return;
   }
 
   const content = payload.content as LessonPartNormalContent;
 
+  crrPaint.partType = "normal";
   crrPaint.elementType = content.type_;
 
   switch (content.type_) {
@@ -90,6 +98,8 @@ function paintWebview(URL: string) {
 }
 
 function paintPanoramicImage(URL: string) {
+  crrPaint.elementType = "img";
+
   const element = paintImage(URL);
 
   document.body.dataset.child = "panoramic";
@@ -98,6 +108,26 @@ function paintPanoramicImage(URL: string) {
   element.style.width = "300%";
   //                             0/1/2
   element.style.left = `-${setup.screenIdx * 100}%`;
+
+  return element;
+}
+
+function paintPanoramicVideo(URL: string) {
+  crrPaint.elementType = "video";
+
+  const element = paintVideo(URL);
+
+  document.body.dataset.child = "panoramic";
+
+  element.style.position = "absolute";
+  element.style.width = "300%";
+  //                             0/1/2
+  element.style.left = `-${setup.screenIdx * 100}%`;
+
+  if (setup.screenIdx) {
+    // only the 0 screen will play sound
+    element.muted = true;
+  }
 
   return element;
 }
