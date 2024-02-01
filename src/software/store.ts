@@ -1,34 +1,34 @@
-import { Lang } from "../shared/types/general";
+import { Locale } from "../shared/types/general";
 import { default as EStore } from "electron-store";
 
 class Store {
   public store = new EStore();
-  private _lang: Lang = "he-il";
+  private _locale: Locale = "he-il";
   private listeners: {
-    [key: string]: (lang: Lang) => void;
+    [key: string]: (locale: Locale) => void;
   } = {};
 
-  get lang() {
-    return this._lang;
+  get locale() {
+    return this._locale;
   }
 
-  set lang(lang: Lang) {
-    this._lang = lang;
-    Object.values(this.listeners).forEach((listener) => listener(lang));
+  set locale(locale: Locale) {
+    this._locale = locale;
+    Object.values(this.listeners).forEach((listener) => listener(locale));
   }
 
   constructor() {
-    this.setLang(this.store.get("lang") as Lang);
+    this.setLocale(this.store.get("locale") as Locale);
   }
 
-  public setLang(lang: Lang) {
-    if (["he-il", "en-us"].includes(lang)) {
-      this.store.set("lang", lang);
-      this.lang = lang;
+  public setLocale(locale: Locale) {
+    if (["he-il", "en-us"].includes(locale)) {
+      this.store.set("locale", locale);
+      this.locale = locale;
     }
   }
 
-  public addListener(key: string, listener: (lang: Lang) => void) {
+  public addListener(key: string, listener: (locale: Locale) => void) {
     this.listeners[key] = listener;
   }
 

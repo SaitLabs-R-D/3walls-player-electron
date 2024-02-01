@@ -1,1 +1,1 @@
-export type Lang = "he-il" | "en-us";
+export type Locale = "he-il" | "en-us";

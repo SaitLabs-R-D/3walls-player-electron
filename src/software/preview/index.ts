@@ -29,10 +29,9 @@ export class Preview {
     this.window.webContents.on("did-fail-load", this.destroy);
 
     this.window.webContents.on("did-finish-load", () => {
-      this.window.webContents.openDevTools();
-      this.window.webContents.send("lang", store.lang);
-      store.addListener("preview", (lang) => {
-        this.window.webContents.send("lang", lang);
+      this.window.webContents.send("locale", store.locale);
+      store.addListener("preview", (locale) => {
+        this.window.webContents.send("locale", locale);
       });
     });
   }
@@ -59,14 +58,14 @@ export class Preview {
     focusWindow(this.window);
   }
 
-  public sendURL(url: string) {
-    const token = url.replace(`${APP_PREFIX}://`, "").replaceAll("/", "");
-
+  public sendToken(token: string) {
     this.window.webContents.send("token", token);
   }
 
   public loadQuestionnaire(token: string) {
-    this.window.loadURL(`${WEBSITE_URL}/software/${token}/questionnaire`);
+    this.window.loadURL(
+      `${WEBSITE_URL}/software/${token}/questionnaire?locale=${store.locale}`
+    );
     this.isQuestionnaireOpen = true;
   }
 }

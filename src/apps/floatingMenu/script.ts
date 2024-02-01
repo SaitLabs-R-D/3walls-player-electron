@@ -1,4 +1,4 @@
-import { Lang, FloatingMenuWindow, ActionsInAPI } from "../../shared/types";
+import { Locale, FloatingMenuWindow, ActionsInAPI } from "../../shared/types";
 
 const win = window as FloatingMenuWindow;
 const buttons = document.querySelectorAll(
@@ -14,15 +14,15 @@ buttons.forEach((button) => {
   });
 });
 
-win.ipcRenderer.onLangChange((lang) => {
-  Object.keys(dictionary[lang]).forEach((key) => {
+win.ipcRenderer.onLocaleChange((locale) => {
+  Object.keys(dictionary[locale]).forEach((key) => {
     const element = document.querySelector(`.${key}`) as HTMLDivElement;
-    element.innerText = dictionary[lang][key];
+    element.innerText = dictionary[locale][key];
   });
 });
 
 const dictionary: {
-  [key in Lang]: {
+  [key in Locale]: {
     [key: string]: string;
   };
 } = {

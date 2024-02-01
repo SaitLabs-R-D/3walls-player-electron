@@ -2,8 +2,8 @@ import { contextBridge, ipcRenderer } from "electron";
 import { FloatingMenuAPI } from "../../../shared/types";
 
 const API: FloatingMenuAPI = {
-  onLangChange: (callback) =>
-    ipcRenderer.on("lang", (_event, value) => callback(value)),
+  onLocaleChange: (callback) =>
+    ipcRenderer.on("locale", (_event, value) => callback(value)),
   actions: {
     escape: () => ipcRenderer.send("escape"),
     next: () => ipcRenderer.send("next"),

@@ -4,7 +4,7 @@ import { APP_PREFIX } from "../../constants";
 import { Preview } from "./preview";
 import { PreviewSubmitTokenPayload } from "../shared/types";
 import { Player } from "./player";
-import { Lang } from "../shared/types/general";
+import { Locale } from "../shared/types/general";
 import { store } from "./store";
 
 //==================//
@@ -42,6 +42,13 @@ async function init() {
 }
 
 function handlePreviewSendURL(URL: string) {
+  const [token, locale] = URL.trim()
+    .replaceAll(APP_PREFIX + "://", "")
+    .replaceAll("/", "")
+    .split("?locale=");
+
+  store.setLocale(locale as Locale);
+
   if (player.isPlaying) return;
 
   if (preview.isQuestionnaireOpen) {
@@ -49,7 +56,7 @@ function handlePreviewSendURL(URL: string) {
   }
 
   preview.focus();
-  preview.sendURL(URL);
+  preview.sendToken(token);
 }
 
 function handleStartLesson(payload: PreviewSubmitTokenPayload) {
@@ -107,6 +114,6 @@ ipcMain.on("start", (_event, payload: PreviewSubmitTokenPayload) =>
   handleStartLesson(payload)
 );
 
-ipcMain.on("intl", (_event, lang: Lang) => {
-  store.setLang(lang);
+ipcMain.on("intl", (_event, locale: Locale) => {
+  store.setLocale(locale);
 });

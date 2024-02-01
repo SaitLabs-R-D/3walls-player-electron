@@ -1,8 +1,8 @@
-import { Lang } from "./general";
+import { Locale } from "./general";
 import { Action } from "./player";
 
 export type FloatingMenuAPI = {
-  onLangChange: (callback: (value: Lang) => void) => void;
+  onLocaleChange: (callback: (value: Locale) => void) => void;
   actions: ActionsInAPI;
 };
 

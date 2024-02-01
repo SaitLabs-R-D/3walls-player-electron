@@ -59,7 +59,7 @@ export class FloatingMenu {
       },
     });
 
-    // check if the window is destroyed
+    // check if the window is closed
     this.window.on("closed", () => {
       console.log(`\nclosed ${this.isShown}\n`);
       if (this.isShown) {
@@ -97,9 +97,9 @@ export class FloatingMenu {
     });
 
     this.window.webContents.on("did-finish-load", () => {
-      this.window.webContents.send("lang", store.lang);
-      store.addListener("floatingMenu", (lang) => {
-        this.window.webContents.send("lang", lang);
+      this.window.webContents.send("locale", store.locale);
+      store.addListener("floatingMenu", (locale) => {
+        this.window.webContents.send("locale", locale);
       });
     });
 

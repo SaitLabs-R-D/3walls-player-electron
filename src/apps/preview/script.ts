@@ -1,4 +1,4 @@
-import { Lang } from "../../shared/types/general";
+import { Locale } from "../../shared/types/general";
 import { PreviewWindow } from "../../shared/types";
 
 const input = document.querySelector("input");
@@ -32,15 +32,15 @@ window.addEventListener("DOMContentLoaded", () => {
     input.value = value;
   });
 
-  win.ipcRenderer.onLangChange((lang) => {
+  win.ipcRenderer.onLocaleChange((locale) => {
     (
       document.querySelector(".intl__circle > img") as HTMLImageElement
-    ).src = `${lang}.webp`;
+    ).src = `${locale}.webp`;
 
-    input.placeholder = dictionary[lang].placeholder;
-    startButton.innerText = dictionary[lang].startBtn;
-    startDevButton.innerText = dictionary[lang].startDevBtn;
-    document.querySelector("p").innerHTML = dictionary[lang].comment;
+    input.placeholder = dictionary[locale].placeholder;
+    startButton.innerText = dictionary[locale].startBtn;
+    startDevButton.innerText = dictionary[locale].startDevBtn;
+    document.querySelector("p").innerHTML = dictionary[locale].comment;
   });
 });
 
@@ -50,9 +50,9 @@ const intlBtns = document.querySelectorAll(".intl__dropdown__item");
 intlBtns.forEach((btn) => {
   btn.addEventListener("click", () => {
     const win = window as PreviewWindow;
-    const lang = btn.getAttribute("id") as Lang;
+    const locale = btn.getAttribute("id") as Locale;
 
-    win.ipcRenderer.setIntl(lang);
+    win.ipcRenderer.setIntl(locale);
   });
 });
 

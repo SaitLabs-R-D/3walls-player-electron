@@ -124,6 +124,7 @@ export class Player {
     try {
       const res = await axios.get(`${API_URL}/watch/data?token=${token}`);
       this.rawData = res.data.content as LessonRawData;
+      console.log(this.rawData);
     } catch (e) {
       log.error("failed to load data", e);
     }
@@ -134,7 +135,11 @@ export class Player {
   //==================//
 
   private play() {
+    console.log(this.data, this.idx, this.data[this.idx]);
+
     const part = this.data[this.idx];
+
+    if (!part) return;
 
     this.screens.forEach((screen, screenIdx) => {
       switch (part.type) {
