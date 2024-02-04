@@ -16,8 +16,9 @@ export class FloatingMenu {
   }
 
   public init() {
-    this.createWindow();
-    this.listen();
+    // TODO: fix relevant issues & uncomment this
+    // this.createWindow();
+    // this.listen();
   }
 
   public destroy() {
