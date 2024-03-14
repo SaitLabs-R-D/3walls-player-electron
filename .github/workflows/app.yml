@@ -36,18 +36,18 @@ jobs:
         node-version: 18.12.1
 
     - name: Compile Electron App
-      uses: x6Pnda/action-electron-compiler@v1
+      uses: x6Pnda/action-electron-compiler@v1.0.1
       with:
         args: --set-product-version ${{ env.VERSION }}
 
-    - id: 'auth'
-      name: 'Authenticate to Google Cloud'
-      uses: 'google-github-actions/auth@v1'
+    - id: auth
+      name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v1
       with:
         credentials_json: '${{ secrets.GCLOUD_SERVICE_ACCOUNT }}'
 
-    - id: 'upload'
-      uses: 'google-github-actions/upload-cloud-storage@v2'
+    - id: upload
+      uses: google-github-actions/upload-cloud-storage@v2
       with:
         path: 'out/make/squirrel.windows/x64/3walls-app-${{ env.VERSION }} Setup.exe'
         destination: '${{ env.BUCKET_NAME }}/lesson-viewer/v1/${{ env.VERSION }}.${{ matrix.platform.extention }}'
