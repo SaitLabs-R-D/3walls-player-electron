@@ -39,7 +39,7 @@ jobs:
         echo "version=$version" >> $GITHUB_OUTPUT
         npm i
         npm run build
-        find out/make/. -name "*.exe" -exec sh "mv '{}' '${version}.${{ matrix.platform.extention }}'" \;
+        find out/make -name "*.exe" -exec sh -c "mv '{}' '${version}.${{ matrix.platform.extention }}'" \;
         
       id: build
       shell: bash
