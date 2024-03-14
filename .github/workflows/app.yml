@@ -34,13 +34,12 @@ jobs:
       with:
         node-version: 18.12.1
 
-    - name: get-npm-version
-      id: version
-      uses: martinbeentjes/npm-get-version-action@v1.3.1
-
     - run: |
+        echo "version=`node -p "require('./package.json').version`" >> $GITHUB_OUTPUT
         npm i
         npm run build
+      id: build
+      shell: bash
 
     - id: auth
       name: Authenticate to Google Cloud
@@ -51,11 +50,11 @@ jobs:
     - id: upload
       uses: google-github-actions/upload-cloud-storage@v2
       with:
-        path: 'out/make/squirrel.windows/x64/3walls-app-${{ steps.package-version.outputs.current-version}} Setup.exe'
-        destination: '${{ env.BUCKET_NAME }}/lesson-viewer/v1/${{ steps.package-version.outputs.current-version}}.${{ matrix.platform.extention }}'
+        path: 'out/make/squirrel.windows/x64/3walls-app-${{ steps.build.outputs.version}} Setup.exe'
+        destination: '${{ env.BUCKET_NAME }}/lesson-viewer/v1/${{ steps.build.outputs.version}}.${{ matrix.platform.extention }}'
 
     - name: Deploy Stage
       uses: fjogeleit/http-request-action@v1
       with:
-        url: '${{ env.API_URL }}/api/v2/viewer/version?version=${{ steps.package-version.outputs.current-version}}'
+        url: '${{ env.API_URL }}/api/v2/viewer/version?version=${{ steps.build.outputs.version}}'
         method: 'POST'
