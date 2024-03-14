@@ -2,6 +2,7 @@ import { app, BrowserWindow, ipcMain } from "electron";
 import path from "path";
 import { APP_PREFIX } from "../../constants";
 import { Preview } from "./preview";
+import { Updater } from "./updater";
 import { PreviewSubmitTokenPayload } from "../shared/types";
 import { Player } from "./player";
 import { Locale } from "../shared/types/general";
@@ -37,8 +38,13 @@ if (!gotTheLock) {
 //==================//
 
 async function init() {
-  preview.createWindow();
-  preview.loadPreviewApp();
+  if (await updater.isLatestVersion()) {
+    preview.createWindow();
+    preview.loadPreviewApp();
+  } else {
+    updater.createWindow();
+    updater.loadUpdater();
+  }
 }
 
 function handlePreviewSendURL(URL: string) {
@@ -74,6 +80,7 @@ function handleShowQuestionnaire() {
 //      Events      //
 //==================//
 
+const updater = new Updater();
 const preview = new Preview();
 const player = new Player(handleShowQuestionnaire);
 
@@ -117,3 +124,7 @@ ipcMain.on("start", (_event, payload: PreviewSubmitTokenPayload) =>
 ipcMain.on("intl", (_event, locale: Locale) => {
   store.setLocale(locale);
 });
+
+ipcMain.on("update", (_event) => {
+  updater.update();
+})

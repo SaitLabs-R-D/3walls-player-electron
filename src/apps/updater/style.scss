@@ -1,0 +1,150 @@
+@import "../root.scss";
+
+body {
+  min-height: 100vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 35px;
+}
+
+.logo {
+  display: grid;
+  place-items: center;
+}
+
+.logo img {
+  width: min(80%, 350px);
+}
+
+div.form {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: 15px;
+  text-align: center;
+  color: white;
+}
+
+input {
+  color: rgb(26, 33, 43) !important;
+}
+
+input,
+button.update {
+  padding-block: 10px;
+  text-align: center;
+  border-radius: 10px;
+
+  font-size: 18px;
+  font-weight: 300;
+
+  box-shadow: 0 0 3px currentColor;
+}
+
+button.update:disabled {
+  background-color: $secondary;
+}
+
+button {
+  color: $primary-color;
+
+  &.update {
+    background-color: $accent;
+    cursor: pointer;
+    font-weight: 600;
+  }
+}
+
+p {
+  font-size: 14px;
+  text-align: center;
+}
+
+.intl_wrapper {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+
+  .intl {
+    position: relative;
+    width: 120px;
+
+    &:not(:hover, :focus-within) .intl__dropdown {
+      display: none;
+    }
+
+    &__circle {
+      background-color: unset;
+      border: unset;
+
+      position: relative;
+
+      height: 35px;
+      width: 35px;
+
+      cursor: pointer;
+
+      img {
+        object-fit: cover;
+        border-radius: 50%;
+        width: 100%;
+        height: 100%;
+      }
+
+      &::after {
+        content: "";
+
+        width: 0;
+        height: 0;
+
+        margin-inline-start: 5px;
+        border-top: 5px solid white;
+
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+      }
+    }
+
+    &__dropdown {
+      display: flex;
+      flex-direction: column;
+
+      background-color: $secondary;
+      border-radius: 1rem;
+      overflow: hidden;
+
+      &__item {
+        background-color: unset;
+        border: unset;
+
+        height: 35px;
+        padding-inline: 10px;
+
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        cursor: pointer;
+
+        &:hover {
+          background-color: $accent;
+        }
+
+        span {
+          color: $primary-color;
+          font-size: 12px;
+        }
+
+        img {
+          width: 30px;
+          height: auto;
+          object-fit: contain;
+        }
+      }
+    }
+  }
+}
