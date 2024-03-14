@@ -35,10 +35,11 @@ jobs:
         node-version: 18.12.1
 
     - run: |
-        echo "version=`node -p \"require('./package.json').version\"`" >> $GITHUB_OUTPUT
+        version=`node -p \"require('./package.json').version\"`
+        echo "version=$version" >> $GITHUB_OUTPUT
         npm i
         npm run build
-        find out/make/. -name "*.exe" -exec sh "mv '{}' '${{ steps.build.outputs.version}}.${{ matrix.platform.extention }}'" \;
+        find out/make/. -name "*.exe" -exec sh "mv '{}' '${version}.${{ matrix.platform.extention }}'" \;
         
       id: build
       shell: bash
