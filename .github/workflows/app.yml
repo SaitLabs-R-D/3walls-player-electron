@@ -40,7 +40,7 @@ jobs:
         npm i
         npm run build
         find out/make -name "*.exe" -exec sh -c "mv '{}' '${version}.${{ matrix.platform.extention }}'" \;
-        
+
       id: build
       shell: bash
 

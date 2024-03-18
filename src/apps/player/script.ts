@@ -3,6 +3,9 @@ import {
   PlayerOnPaintPayload,
   PlayerWindow,
 } from "../../shared/types";
+import {
+  SCREENS_COUNT
+} from "../../../constants"
 import { getGCPURLVideoOrImage, isYoutube } from "../../shared/utils";
 
 //==================//
@@ -18,6 +21,7 @@ const crrPaint: {
 
 const setup = {
   screenIdx: 0,
+  isMuted: false,
 };
 
 //==================//
@@ -124,7 +128,7 @@ function paintPanoramicVideo(URL: string) {
   //                             0/1/2
   element.style.left = `-${setup.screenIdx * 100}%`;
 
-  if (setup.screenIdx) {
+  if (setup.isMuted) {
     // only the 0 screen will play sound
     element.muted = true;
   }
@@ -141,6 +145,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   win.ipcRenderer.onSetup((screenIdx) => {
     setup.screenIdx = screenIdx;
+    setup.isMuted = SCREENS_COUNT == 3 ? screenIdx == 1 ? false : true : false;
   });
 
   win.ipcRenderer.onPaint((payload) => {
