@@ -11,6 +11,7 @@ env:
   BUCKET_NAME: ${{ github.ref_type == 'tag' && secrets.PROD_BUCKET || secrets.DEV_BUCKET }}
   API_URL: ${{ github.ref_type == 'tag' && vars.PROD_API_URL || vars.DEV_API_URL }}
   WEBSITE_URL: ${{ github.ref_type == 'tag' && vars.PROD_WEBSITE_URL || vars.DEV_WEBSITE_URL }}
+  ENV: ${{ github.ref_type == 'tag' && 'prod' || 'dev' }}
 
 jobs:
 
@@ -43,7 +44,7 @@ jobs:
     - name: Build app
       run: |
         npm i
-        npm run build
+        npm run build:${{ env.ENV }}
       id: build
 
     - name: Pre-deploy
