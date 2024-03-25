@@ -34,14 +34,21 @@ jobs:
       with:
         node-version: 18.12.1
 
-    - run: |
+    - name: Extract version
+      run: |
         version=`node -p "require('./package.json').version"`
         echo "version=$version" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Build app
+      run: |
         npm i
         npm run build
-        find out/make -name "*.exe" -exec sh -c "mv '{}' '${version}.${{ matrix.platform.extention }}'" \;
-
       id: build
+
+    - name: Pre-deploy
+      run: |
+        find out/make -name "*.exe" -exec sh -c "mv '{}' '${version}.${{ matrix.platform.extention }}'" \;
       shell: bash
 
     - id: auth

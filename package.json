@@ -5,11 +5,14 @@
   "description": "An immersive learning experience",
   "main": ".vite/build/main.js",
   "scripts": {
-    "dev": "electron-forge start",
+    "dev": "cross-env NODE_ENV=local electron-forge start",
     "package": "electron-forge package",
+    "package:dev": "cross-env NODE_ENV=development electron-forge package",
+    "package:prod": "cross-env NODE_ENV=production electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "build": "npm run package && npm run make",
+    "build:dev": "npm run package:dev && npm run make",
+    "build:prod": "npm run package:prod && npm run make",
     "lint": "eslint --ext .ts,.tsx ."
   },
   "keywords": [],
@@ -37,6 +40,7 @@
   },
   "dependencies": {
     "axios": "^1.6.2",
+    "cross-env": "^7.0.3",
     "electron-dl": "^3.5.2",
     "electron-log": "^5.0.1",
     "electron-squirrel-startup": "^1.0.0",
