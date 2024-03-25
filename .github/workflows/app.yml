@@ -49,7 +49,7 @@ jobs:
 
     - name: Pre-deploy
       run: |
-        find out/make -name "*.exe" -exec sh -c "mv '{}' '${version}.${{ matrix.platform.extention }}'" \;
+        find out/make -name "*.exe" -exec sh -c "mv '{}' '${{ steps.build.outputs.version}}.${{ matrix.platform.extention }}'" \;
       shell: bash
 
     - id: auth
