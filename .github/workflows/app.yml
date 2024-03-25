@@ -40,6 +40,7 @@ jobs:
         version=`node -p "require('./package.json').version"`
         echo "version=$version" >> $GITHUB_OUTPUT
       shell: bash
+      id: version
 
     - name: Build app
       run: |
@@ -49,7 +50,7 @@ jobs:
 
     - name: Pre-deploy
       run: |
-        find out/make -name "*.exe" -exec sh -c "mv '{}' '${{ steps.build.outputs.version}}.${{ matrix.platform.extention }}'" \;
+        find out/make -name "*.exe" -exec sh -c "mv '{}' '${{ steps.version.outputs.version}}.${{ matrix.platform.extention }}'" \;
       shell: bash
 
     - id: auth
@@ -68,5 +69,5 @@ jobs:
     - name: Deploy Stage
       uses: fjogeleit/http-request-action@v1
       with:
-        url: '${{ env.API_URL }}/api/v2/viewer/version?version=${{ steps.build.outputs.version}}'
+        url: '${{ env.API_URL }}/api/v2/viewer/version?version=${{ steps.version.outputs.version}}'
         method: 'POST'
