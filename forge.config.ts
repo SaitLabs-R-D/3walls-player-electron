@@ -6,6 +6,8 @@ import { MakerRpm } from "@electron-forge/maker-rpm";
 import { VitePlugin } from "@electron-forge/plugin-vite";
 import { APP_PREFIX } from "./constants";
 
+let fs = require("fs");
+
 const config: ForgeConfig = {
   packagerConfig: {
     icon: "./public/icon.ico",
@@ -15,6 +17,16 @@ const config: ForgeConfig = {
         schemes: [APP_PREFIX],
       },
     ],
+  },
+  hooks: {
+    generateAssets: async () => {
+      fs.writeFileSync(
+        './env.json',
+        JSON.stringify({
+          NODE_ENV: process.env.NODE_ENV
+        })
+      );
+    }
   },
   rebuildConfig: {},
   makers: [
