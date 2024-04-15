@@ -1,8 +1,10 @@
 import path from "path";
 import { APP_ICON_PATH, SCREENS_COUNT } from "../../../constants";
 import { BrowserWindow, ipcMain, screen } from "electron";
-import { loadApp } from "../helpers";
+import { displaysCount, loadApp } from "../helpers";
 import { LessonContent } from "../../shared/types";
+
+// const DISPLAYS_COUNT = displaysCount()
 
 export class Part {
   public window: BrowserWindow;

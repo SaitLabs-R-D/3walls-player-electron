@@ -36,3 +36,8 @@ export const focusWindow = (window: BrowserWindow | null) => {
   window.show();
   window.focus();
 };
+
+export const displaysCount = () => {
+  const { screen } = require('electron')
+  return screen.getAllDisplays().length;
+}

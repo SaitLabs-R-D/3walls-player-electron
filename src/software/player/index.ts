@@ -13,6 +13,7 @@ import { Part } from "./part";
 import { FloatingMenu } from "./floatingMenu";
 import { globalShortcut } from "electron";
 import { functionize } from "../../shared/utils";
+import { displaysCount } from "../helpers";
 import { actions } from "./config";
 import { Video } from "./adapters";
 
@@ -87,7 +88,7 @@ export class Player {
 
   private loadScreens() {
     let windowsLoadedCount = 0;
-
+    // const DISPLAYS_COUNT = displaysCount()
     for (let idx = 0; idx < SCREENS_COUNT; idx++) {
       const screen = new Part(idx, this.devMode);
       this.screens.push(screen);
@@ -202,13 +203,14 @@ export class Player {
       this.showQuestionnaire();
       return;
     }
-
+    this.cancelRequests()
     this.setIdx = this.idx + 1;
   }
 
   private onPrev() {
     if (this.idx > 0) {
-      this.setIdx = this.idx - 1;
+    this.cancelRequests()
+    this.setIdx = this.idx - 1;
     }
   }
 
@@ -228,5 +230,11 @@ export class Player {
 
   private onVideoToggleFullscreen() {
     this.sendAction("videoToggleFullscreen");
+  }
+
+  private cancelRequests() {
+    this.screens.forEach((screen) => {
+      screen.window.webContents.stop();
+    });
   }
 }
