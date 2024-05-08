@@ -10,10 +10,14 @@ export class Part {
   public window: BrowserWindow;
   private screenIdx: number;
   private devMode: boolean;
+  private width: number;
+  private height: number;
 
   constructor(screenIdx: number, devMode = false) {
     this.screenIdx = SCREENS_COUNT - screenIdx - 1;
     this.devMode = devMode;
+    this.width = null;
+    this.height = null;
     this.createWindow();
   }
 
@@ -30,6 +34,9 @@ export class Part {
 
   private createWindow() {
     this.window = new BrowserWindow({
+      frame: false,
+      width: this.width,
+      height: this.height,
       autoHideMenuBar: true,
       icon: APP_ICON_PATH,
       webPreferences: {
@@ -57,6 +64,8 @@ export class Part {
     if (this.devMode) {
       const width = Math.floor(screens[0].workArea.width / SCREENS_COUNT);
       const x = width * this.screenIdx;
+      this.width = width;
+      this.height = screens[0].workArea.height;
 
       this.window.setPosition(x, 0);
       this.window.setSize(width, screens[0].workArea.height);
