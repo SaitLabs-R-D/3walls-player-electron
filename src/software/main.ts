@@ -1,12 +1,13 @@
 import { app, BrowserWindow, ipcMain } from "electron";
 import path from "path";
-import { APP_PREFIX } from "../../constants";
+import { APP_PREFIX, SCREENS_COUNT } from "../../constants";
 import { Preview } from "./preview";
 import { Updater } from "./updater";
 import { PreviewSubmitTokenPayload } from "../shared/types";
 import { Player } from "./player";
 import { Locale } from "../shared/types/general";
 import { store } from "./store";
+import { displaysCount } from "./helpers";
 
 //==================//
 //      Setup       //
@@ -67,7 +68,8 @@ function handlePreviewSendURL(URL: string) {
 
 function handleStartLesson(payload: PreviewSubmitTokenPayload) {
   preview.minimize();
-  player.loadLesson(payload.token, payload.devMode);
+  const isDev = displaysCount() < SCREENS_COUNT;
+  player.loadLesson(payload.token, isDev);
 }
 
 function handleShowQuestionnaire() {

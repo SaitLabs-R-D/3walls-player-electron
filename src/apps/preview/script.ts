@@ -1,16 +1,14 @@
 import { Locale } from "../../shared/types/general";
 import { PreviewWindow } from "../../shared/types";
-import { displaysCount } from "src/software/helpers";
 
 const input = document.querySelector("input");
 const startButton = document.querySelector("button.start") as HTMLButtonElement;
 
 function sendToken(e: MouseEvent | KeyboardEvent) {
   // const isDev = (e.target as HTMLButtonElement).classList.contains("dev");
-  const isDev = displaysCount() == 1;
 
   const win = window as PreviewWindow;
-  win.ipcRenderer.submitToken(input.value, isDev);
+  win.ipcRenderer.submitToken(input.value, false);
 
   input.value = "";
 }
