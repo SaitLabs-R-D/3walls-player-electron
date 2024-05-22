@@ -1,14 +1,13 @@
 import { Locale } from "../../shared/types/general";
 import { PreviewWindow } from "../../shared/types";
+import { displaysCount } from "src/software/helpers";
 
 const input = document.querySelector("input");
 const startButton = document.querySelector("button.start") as HTMLButtonElement;
-const startDevButton = document.querySelector(
-  "button.dev"
-) as HTMLButtonElement;
 
 function sendToken(e: MouseEvent | KeyboardEvent) {
-  const isDev = (e.target as HTMLButtonElement).classList.contains("dev");
+  // const isDev = (e.target as HTMLButtonElement).classList.contains("dev");
+  const isDev = displaysCount() == 1;
 
   const win = window as PreviewWindow;
   win.ipcRenderer.submitToken(input.value, isDev);
@@ -23,7 +22,6 @@ input.addEventListener("keyup", (e) => {
 });
 
 startButton.addEventListener("click", sendToken);
-startDevButton.addEventListener("click", sendToken);
 
 window.addEventListener("DOMContentLoaded", () => {
   const win = window as PreviewWindow;
@@ -39,7 +37,6 @@ window.addEventListener("DOMContentLoaded", () => {
 
     input.placeholder = dictionary[locale].placeholder;
     startButton.innerText = dictionary[locale].startBtn;
-    startDevButton.innerText = dictionary[locale].startDevBtn;
     document.querySelector("p").innerHTML = dictionary[locale].comment;
   });
 });
@@ -60,13 +57,11 @@ const dictionary = {
   "he-il": {
     placeholder: "קוד שיעור",
     startBtn: "התחלת השיעור",
-    startDevBtn: "בדיקת השיעור",
     comment: "לחץ ctrl+v בשדה שמעל",
   },
   "en-us": {
     placeholder: "Lesson Code",
     startBtn: "Start Lesson",
-    startDevBtn: "Start Lesson (Dev)",
     comment: "Press ctrl+v in the field above",
   },
 };
