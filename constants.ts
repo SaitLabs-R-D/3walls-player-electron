@@ -1,10 +1,11 @@
 export const APP_PREFIX = "threewalls-app";
 export const APP_ICON_PATH = "public/icon.png";
+import * as env from './env.json';
 
 var apiURL;
 var websiteUrl;
 
-switch (process.env.NODE_ENV) {
+switch (env.NODE_ENV) {
     case 'local':
         apiURL = "http://127.0.0.1:7000/api/v2";
         websiteUrl = "http://localhost:5173";
