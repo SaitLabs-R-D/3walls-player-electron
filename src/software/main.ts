@@ -1,6 +1,6 @@
 import { app, BrowserWindow, ipcMain } from "electron";
 import path from "path";
-import { APP_PREFIX, SCREENS_COUNT } from "../../constants";
+import { APP_PREFIX, SCREENS_COUNT } from "./constants";
 import { Preview } from "./preview";
 import { Updater } from "./updater";
 import { PreviewSubmitTokenPayload } from "../shared/types";
