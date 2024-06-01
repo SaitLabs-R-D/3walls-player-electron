@@ -1,12 +1,7 @@
 export const APP_PREFIX = "threewalls-app";
 export const APP_ICON_PATH = "public/icon.png";
 
-let env;
-try {
-    env = require('./env.json')
-} catch (e) {
-    env = { NODE_ENV: process.env.NODE_ENV }
-};
+const env = require('./env.json')
 
 var apiURL;
 var websiteUrl;

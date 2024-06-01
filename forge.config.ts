@@ -16,9 +16,6 @@ const config: ForgeConfig = {
         schemes: [APP_PREFIX],
       },
     ],
-    extraResource: [
-      "env.json",
-    ]
   },
   hooks: {
     generateAssets: async () => {

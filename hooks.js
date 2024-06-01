@@ -8,4 +8,5 @@ export const generate = async () => {
     'env.json',
     JSON.stringify({NODE_ENV: env})
   );
+  console.log("Created env.json file");
 }
