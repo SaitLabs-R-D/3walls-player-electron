@@ -5,8 +5,7 @@ import { MakerDeb } from "@electron-forge/maker-deb";
 import { MakerRpm } from "@electron-forge/maker-rpm";
 import { VitePlugin } from "@electron-forge/plugin-vite";
 import { APP_PREFIX } from "./constants";
-
-let fs = require("fs");
+import { generate } from "./hooks";
 
 const config: ForgeConfig = {
   packagerConfig: {
@@ -17,15 +16,13 @@ const config: ForgeConfig = {
         schemes: [APP_PREFIX],
       },
     ],
+    extraResource: [
+      "env.json",
+    ]
   },
   hooks: {
     generateAssets: async () => {
-      fs.writeFileSync(
-        './env.json',
-        JSON.stringify({
-          NODE_ENV: process.env.NODE_ENV
-        })
-      );
+      await generate()
     }
   },
   rebuildConfig: {},
