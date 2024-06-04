@@ -5,7 +5,7 @@ import { MakerDeb } from "@electron-forge/maker-deb";
 import { MakerRpm } from "@electron-forge/maker-rpm";
 import { VitePlugin } from "@electron-forge/plugin-vite";
 import { APP_PREFIX } from "./constants";
-import { generate } from "./hooks";
+import { generateAssets } from "./hooks";
 
 const config: ForgeConfig = {
   packagerConfig: {
@@ -18,9 +18,7 @@ const config: ForgeConfig = {
     ],
   },
   hooks: {
-    generateAssets: async () => {
-      await generate()
-    }
+    generateAssets,
   },
   rebuildConfig: {},
   makers: [
