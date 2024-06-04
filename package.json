@@ -12,8 +12,8 @@
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "build": "npm run package && npm run make",
-    "build:dev": "cross-env NODE_ENV=development && npm run build",
-    "build:prod": "cross-env NODE_ENV=production && npm run build",
+    "build:dev": "cross-env NODE_ENV=development npm run build",
+    "build:prod": "cross-env NODE_ENV=production npm run build",
     "lint": "eslint --ext .ts,.tsx ."
   },
   "keywords": [],
