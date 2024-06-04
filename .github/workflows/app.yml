@@ -45,7 +45,7 @@ jobs:
     - name: Build app
       run: |
         npm i
-        npm run ci:${{ env.ENV }}
+        npm run build:${{ env.ENV }}
       id: build
 
     - name: Pre-deploy
