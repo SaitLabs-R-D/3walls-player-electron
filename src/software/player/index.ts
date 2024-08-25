@@ -1,6 +1,6 @@
 import axios from "axios";
 import log from "electron-log";
-import { API_URL, SCREENS_COUNT } from "../../../constants";
+import { API_URL, MULTIPLE_SCREENS, DEFAULT_SCREENS } from "../../../constants";
 import {
   Action,
   FunctionizedAction,
@@ -88,13 +88,15 @@ export class Player {
 
   private loadScreens() {
     let windowsLoadedCount = 0;
-    // const DISPLAYS_COUNT = displaysCount()
-    for (let idx = 0; idx < SCREENS_COUNT; idx++) {
+    const DISPLAYS_COUNT = displaysCount()
+    const SCREEN_COUNT = MULTIPLE_SCREENS.includes(DISPLAYS_COUNT) ? DISPLAYS_COUNT : DEFAULT_SCREENS ;
+    
+    for (let idx = 0; idx < SCREEN_COUNT; idx++) {
       const screen = new Part(idx, this.devMode);
       this.screens.push(screen);
 
       screen.window.on("ready-to-show", () => {
-        if (++windowsLoadedCount === SCREENS_COUNT) {
+        if (SCREEN_COUNT === ++windowsLoadedCount) {          
           this.init();
         }
       });
@@ -108,10 +110,10 @@ export class Player {
   private formatData(rawData: LessonRawData = this.rawData) {
     for (const rawLesson of rawData.sort((a, b) => a.order - b.order)) {
       const content =
-        rawLesson.type === "normal"
+        rawLesson.type !== "panoramic"
           ? rawLesson.screens
-          : { url: rawLesson.gcp_path };
-
+          : { url: rawLesson.gcp_path || rawLesson.panoramic_url, panoramic_type: rawLesson.panoramic_type };
+      
       this.data.push({
         _id: rawLesson._id,
         order: rawLesson.order,
@@ -126,7 +128,6 @@ export class Player {
     try {
       const res = await axios.get(`${API_URL}/watch/data?token=${token}`);
       this.rawData = res.data.content as LessonRawData;
-      console.log(this.rawData);
     } catch (e) {
       log.error("failed to load data", e);
     }
@@ -148,6 +149,12 @@ export class Player {
             part.type,
             (part as LessonPart<"normal">).content[screenIdx]
           );
+          break;
+        case "four_screens":
+          screen.paint(
+            part.type,
+            (part as LessonPart<"four_screens">).content[screenIdx]
+          )
           break;
         case "panoramic":
           screen.paint(part.type, (part as LessonPart<"panoramic">).content);

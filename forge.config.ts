@@ -6,6 +6,7 @@ import { MakerRpm } from "@electron-forge/maker-rpm";
 import { VitePlugin } from "@electron-forge/plugin-vite";
 import { APP_PREFIX } from "./constants";
 import { generateAssets } from "./hooks";
+import { MakerDMG } from "@electron-forge/maker-dmg";
 
 const config: ForgeConfig = {
   packagerConfig: {
@@ -16,6 +17,13 @@ const config: ForgeConfig = {
         schemes: [APP_PREFIX],
       },
     ],
+    // osxSign: {},
+    // osxNotarize: {
+    //   tool: 'notarytool',
+    //   appleId: process.env.APPLE_ID,
+    //   appleIdPassword: process.env.APPLE_PASSWORD,
+    //   teamId: process.env.APPLE_TEAM_ID
+    // }
   },
   hooks: {
     generateAssets,
@@ -25,6 +33,13 @@ const config: ForgeConfig = {
     new MakerSquirrel({
       setupIcon: "./public/icon.ico",
     }),
+    {
+      name: "@electron-forge/maker-zip",
+      config: {
+        platforms: ["darwin"],
+      }
+    },
+    new MakerDMG({})
     // new MakerZIP({}, ["darwin"]),
     // new MakerRpm({}),
     // new MakerDeb({}),

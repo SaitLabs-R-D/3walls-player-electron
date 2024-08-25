@@ -5,7 +5,7 @@ export const isYoutube = (URL: string) =>
   URL.includes("youtube") || URL.includes("youtu.be");
 
 export const VIDEO_EXTENSIONS = ["mp4", "mov", "avi", "mkv", "webm"];
-export const IMAGE_EXTENSIONS = ["jpg", "jpeg", "png", "gif", "svg"];
+export const IMAGE_EXTENSIONS = ["jpg", "jpeg", "png", "gif", "svg", "webp"];
 
 export const getGCPURLVideoOrImage = (URL: string) => {
   const fileType = URL.split("?")[0].split(".").pop();

@@ -25,9 +25,9 @@ export type LessonPart<T = LessonPartType> = {
   content: LessonContent<T>;
 };
 
-export type LessonContent<T = LessonPartType> = T extends "normal"
-  ? LessonPartNormalContent[]
-  : LessonPartPanoramicContent;
+export type LessonContent<T = LessonPartType> = T extends "panoramic"
+  ? LessonPartPanoramicContent  
+  : LessonPartNormalContent[];
 
 export type LessonPartNormalContent = {
   url: string;
@@ -38,7 +38,8 @@ export type LessonPartNormalContent = {
 
 export type LessonPartPanoramicContent = {
   url: string;
+  panoramic_type: LessonPartNormalScreenType;
 };
 
-export type LessonPartType = "normal" | "panoramic";
+export type LessonPartType = "normal" | "panoramic" | "four_screens";
 export type LessonPartNormalScreenType = "img" | "video" | "browser";

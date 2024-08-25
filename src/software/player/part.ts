@@ -1,5 +1,5 @@
 import path from "path";
-import { APP_ICON_PATH, SCREENS_COUNT } from "../../../constants";
+import { APP_ICON_PATH, MULTIPLE_SCREENS, DEFAULT_SCREENS } from "../../../constants";
 import { BrowserWindow, ipcMain, screen } from "electron";
 import { displaysCount, loadApp } from "../helpers";
 import { LessonContent } from "../../shared/types";
@@ -12,9 +12,13 @@ export class Part {
   private devMode: boolean;
   private width: number;
   private height: number;
+  private screenCount: number;
 
   constructor(screenIdx: number, devMode = false) {
-    this.screenIdx = SCREENS_COUNT - screenIdx - 1;
+    const DISPLAYS_COUNT = displaysCount()
+    this.screenCount = MULTIPLE_SCREENS.includes(DISPLAYS_COUNT) ? DISPLAYS_COUNT : DEFAULT_SCREENS ; 
+
+    this.screenIdx = this.screenCount - screenIdx - 1;
     this.devMode = devMode;
     this.width = null;
     this.height = null;
@@ -62,7 +66,7 @@ export class Part {
     const screens = this.getAllDisplays();
 
     if (this.devMode) {
-      const width = Math.floor(screens[0].workArea.width / SCREENS_COUNT);
+      const width = Math.floor(screens[0].workArea.width / this.screenCount);
       const x = width * this.screenIdx;
       this.width = width;
       this.height = screens[0].workArea.height;

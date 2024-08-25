@@ -3,10 +3,7 @@ import {
   PlayerOnPaintPayload,
   PlayerWindow,
 } from "../../shared/types";
-import {
-  SCREENS_COUNT
-} from "../../../constants"
-import { getGCPURLVideoOrImage, isYoutube } from "../../shared/utils";
+import { isYoutube } from "../../shared/utils";
 
 //==================//
 //     Constants    //
@@ -14,7 +11,7 @@ import { getGCPURLVideoOrImage, isYoutube } from "../../shared/utils";
 
 const crrPaint: {
   element?: HTMLElement;
-  partType?: "normal" | "panoramic";
+  partType?: "normal" | "panoramic" | "four_screens";
   elementType?: "img" | "video" | "browser";
   isYoutube?: boolean;
 } = {};
@@ -29,14 +26,18 @@ const setup = {
 //==================//
 
 function paint(payload: PlayerOnPaintPayload) {
+  console.log("payload", payload);
+  
   if (payload.type === "panoramic") {
     crrPaint.partType = "panoramic";
 
-    const type = getGCPURLVideoOrImage(payload.content.url);
-    if (type == "image") {
+    if (payload.content.panoramic_type == "image") {
       crrPaint.element = paintPanoramicImage(payload.content.url);
-    } else if (type == "video") {
+    } else if (payload.content.panoramic_type == "video") {
       crrPaint.element = paintPanoramicVideo(payload.content.url);
+    } else if (payload.content.panoramic_type == "browser") {
+      crrPaint.element = paintPanoramicWebview(payload.content.url);
+      crrPaint.isYoutube = isYoutube(payload.content.url);
     }
 
     return;
@@ -101,6 +102,28 @@ function paintWebview(URL: string) {
   return element;
 }
 
+function paintPanoramicWebview(URL: string) {
+  crrPaint.elementType = "browser";
+
+  const element = paintWebview(URL);
+  
+  document.body.dataset.child = "panoramic";
+
+  element.style.position = "absolute";
+  element.style.width = "300%";
+  //                             0/1/2
+  element.style.left = `-${setup.screenIdx * 100}%`;
+  
+  if (setup.isMuted) {
+    // only the 0 screen will play sound
+    element.addEventListener('dom-ready', () => {
+      element.setAudioMuted(true)
+    })
+  }
+
+  return element;
+}
+
 function paintPanoramicImage(URL: string) {
   crrPaint.elementType = "img";
 
@@ -145,12 +168,11 @@ window.addEventListener("DOMContentLoaded", () => {
 
   win.ipcRenderer.onSetup((screenIdx) => {
     setup.screenIdx = screenIdx;
-    setup.isMuted = SCREENS_COUNT == 3 ? screenIdx == 1 ? false : true : false;
+    setup.isMuted = screenIdx == 1 ? false : true;
   });
 
   win.ipcRenderer.onPaint((payload) => {
     cleanup();
-    console.log(payload);
     paint(payload);
   });
 

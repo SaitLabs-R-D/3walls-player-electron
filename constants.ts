@@ -23,4 +23,5 @@ switch (env.NODE_ENV) {
 
 export const API_URL = apiURL;
 export const WEBSITE_URL = websiteUrl
-export const SCREENS_COUNT = 3;
+export const DEFAULT_SCREENS = 3;
+export const MULTIPLE_SCREENS = [3, 4];

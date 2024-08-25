@@ -1,6 +1,6 @@
 import { app, BrowserWindow, ipcMain } from "electron";
 import path from "path";
-import { APP_PREFIX, SCREENS_COUNT } from "../../constants";
+import { APP_PREFIX, MULTIPLE_SCREENS } from "../../constants";
 import { Preview } from "./preview";
 import { Updater } from "./updater";
 import { PreviewSubmitTokenPayload } from "../shared/types";
@@ -68,7 +68,7 @@ function handlePreviewSendURL(URL: string) {
 
 function handleStartLesson(payload: PreviewSubmitTokenPayload) {
   preview.minimize();
-  const isDev = displaysCount() < SCREENS_COUNT;
+  const isDev = ! MULTIPLE_SCREENS.includes(displaysCount());
   player.loadLesson(payload.token, isDev);
 }
 

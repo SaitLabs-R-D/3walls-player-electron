@@ -8,10 +8,10 @@
     "local": "cross-env NODE_ENV=local electron-forge start",
     "dev": "cross-env NODE_ENV=development electron-forge start",
     "prod": "electron-forge start",
-    "package": "electron-forge package",
-    "make": "electron-forge make",
+    "package": "electron-forge package --platform=darwin",
+    "make": "electron-forge make --platform=darwin",
     "publish": "electron-forge publish",
-    "build": "npm run package && npm run make",
+    "build:local": "cross-env NODE_ENV=local npm run package && npm run make",
     "build:dev": "cross-env NODE_ENV=development npm run build",
     "build:prod": "cross-env NODE_ENV=production npm run build",
     "lint": "eslint --ext .ts,.tsx ."
@@ -25,6 +25,7 @@
   "devDependencies": {
     "@electron-forge/cli": "^7.2.0",
     "@electron-forge/maker-deb": "^7.2.0",
+    "@electron-forge/maker-dmg": "^7.4.0",
     "@electron-forge/maker-rpm": "^7.2.0",
     "@electron-forge/maker-squirrel": "^7.2.0",
     "@electron-forge/maker-zip": "^7.2.0",
