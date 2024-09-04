@@ -42,6 +42,11 @@ jobs:
       shell: bash
       id: version
 
+    - name: MacOS preps
+      run: |
+        npm install -g appdmg
+      if: ${{ contains(matrix.platform.extention, 'dmg') }}
+
     - name: Build app
       run: |
         npm i
