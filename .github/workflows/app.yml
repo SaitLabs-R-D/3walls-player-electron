@@ -42,6 +42,11 @@ jobs:
       shell: bash
       id: version
 
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+      if: ${{ contains(matrix.platform.extention, 'dmg') }}
+      
     - name: MacOS preps
       run: |
         npm install -g appdmg
