@@ -23,8 +23,8 @@ jobs:
           platform:
           - os: windows-latest
             extention: exe
-          # - os: macos-latest
-          #   extention: dmg
+          - os: macos-latest
+            extention: dmg
 
     steps:
     - name: Check out code
@@ -50,7 +50,7 @@ jobs:
 
     - name: Pre-deploy
       run: |
-        find out/make -name "*.exe" -exec sh -c "mv '{}' '${{ steps.version.outputs.version}}.${{ matrix.platform.extention }}'" \;
+        find out/make -name "*.${{ matrix.platform.extention }}" -exec sh -c "mv '{}' '${{ steps.version.outputs.version}}.${{ matrix.platform.extention }}'" \;
       shell: bash
 
     - id: auth
