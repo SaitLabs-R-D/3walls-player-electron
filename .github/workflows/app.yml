@@ -23,8 +23,10 @@ jobs:
           platform:
           - os: windows-latest
             extention: exe
+            short: win
           - os: macos-latest
             extention: dmg
+            short: mac
 
     steps:
     - name: Check out code
@@ -55,7 +57,7 @@ jobs:
     - name: Build app
       run: |
         npm i
-        npm run build:${{ env.ENV }}
+        npm run build:${{ env.ENV }}:${{ matrix.platform.short }}
       id: build
 
     - name: Pre-deploy

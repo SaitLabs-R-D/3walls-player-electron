@@ -16,8 +16,10 @@
     "make:win": "electron-forge make",
     "make:mac": "electron-forge make --platform=darwin",
     "build:local": "cross-env NODE_ENV=local npm run package && npm run make",
-    "build:dev": "cross-env NODE_ENV=development npm run build:all",
-    "build:prod": "cross-env NODE_ENV=production npm run build:all",
+    "build:dev:win": "cross-env NODE_ENV=development npm run build:win",
+    "build:dev:mac": "cross-env NODE_ENV=development npm run build:mac",
+    "build:prod:win": "cross-env NODE_ENV=production npm run build:win",
+    "build:prod:mac": "cross-env NODE_ENV=production npm run build:mac",
     "publish": "electron-forge publish",
     "lint": "eslint --ext .ts,.tsx ."
   },
