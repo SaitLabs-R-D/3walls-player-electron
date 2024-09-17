@@ -3,7 +3,7 @@ import {
   PlayerOnPaintPayload,
   PlayerWindow,
 } from "../../shared/types";
-import { isYoutube } from "../../shared/utils";
+import { getGCPURLVideoOrImage, isYoutube } from "../../shared/utils";
 
 //==================//
 //     Constants    //
@@ -26,16 +26,16 @@ const setup = {
 //==================//
 
 function paint(payload: PlayerOnPaintPayload) {
-  console.log("payload", payload);
   
   if (payload.type === "panoramic") {
     crrPaint.partType = "panoramic";
+    const type = payload.content.panoramic_type ? payload.content.panoramic_type : getGCPURLVideoOrImage(payload.content.url)
 
-    if (payload.content.panoramic_type == "image") {
+    if (type == "image") {
       crrPaint.element = paintPanoramicImage(payload.content.url);
-    } else if (payload.content.panoramic_type == "video") {
+    } else if (type == "video") {
       crrPaint.element = paintPanoramicVideo(payload.content.url);
-    } else if (payload.content.panoramic_type == "browser") {
+    } else if (type == "browser") {
       crrPaint.element = paintPanoramicWebview(payload.content.url);
       crrPaint.isYoutube = isYoutube(payload.content.url);
     }
