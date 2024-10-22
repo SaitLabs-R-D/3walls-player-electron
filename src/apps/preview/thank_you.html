@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3 Walls</title>
+    <link rel="stylesheet" href="./style.scss" />
+  </head>
+  <body class="screen">
+    <div class="intl_wrapper">
+      <div class="intl">
+        <button class="intl__circle">
+          <img src="./en-us.webp" alt="flag" />
+        </button>
+        <div class="intl__dropdown">
+          <button class="intl__dropdown__item" id="en-us">
+            <img src="./en-us.webp" alt="flag" />
+            <span>English</span>
+          </button>
+          <button class="intl__dropdown__item" id="he-il">
+            <img src="./he-il.webp" alt="flag" />
+            <span>עברית</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="logo">
+      <img src="./logo.ico" alt="logo" />
+    </div>
+    <div class="form">
+      <p class="thankyou" style="display: block;">תודה על השתתפותך</p>
+      <button id="close" class="start">סגור</button>
+    </div>
+  </body>
+  <script src="./script.ts" type="module"></script>
+</html>

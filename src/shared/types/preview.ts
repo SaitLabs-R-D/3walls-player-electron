@@ -5,6 +5,7 @@ export type PreviewAPI = {
   submitToken: (token: string, devMode: boolean) => void;
   setIntl: (locale: Locale) => void;
   onLocaleChange: (callback: PreviewOnLocaleChange) => void;
+  closeWindow: () => void;
 };
 
 export type PreviewOnSendToken = (value: string) => void;

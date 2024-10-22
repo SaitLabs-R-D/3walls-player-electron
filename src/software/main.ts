@@ -58,7 +58,7 @@ function handlePreviewSendURL(URL: string) {
 
   if (player.isPlaying) return;
 
-  if (preview.isQuestionnaireOpen) {
+  if (preview.isThankYouOpen) {
     preview.loadPreviewApp();
   }
 
@@ -72,8 +72,8 @@ function handleStartLesson(payload: PreviewSubmitTokenPayload) {
   player.loadLesson(payload.token, isDev);
 }
 
-function handleShowQuestionnaire() {
-  preview.loadQuestionnaire(player.token);
+async function handleshowThankYou() {
+  preview.loadThankYou(player.token);
   preview.focus();
   player.reset();
 }
@@ -84,7 +84,7 @@ function handleShowQuestionnaire() {
 
 const updater = new Updater();
 const preview = new Preview();
-const player = new Player(handleShowQuestionnaire);
+const player = new Player(handleshowThankYou);
 
 // app.on("open-url", () => {
 //   dialog.showErrorBox(

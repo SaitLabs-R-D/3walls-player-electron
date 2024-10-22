@@ -10,6 +10,7 @@ const API: PreviewAPI = {
   setIntl: (locale) => ipcRenderer.send("intl", locale),
   onLocaleChange: (callback: (value: Locale) => void) =>
     ipcRenderer.on("locale", (_event, value) => callback(value)),
+  closeWindow: () => ipcRenderer.send("close-window"),
 };
 
 contextBridge.exposeInMainWorld("ipcRenderer", API);

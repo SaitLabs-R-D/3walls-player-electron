@@ -1,11 +1,11 @@
 import { BrowserWindow } from "electron";
 import path from "path";
 
-export const loadApp = (window: BrowserWindow, name: string, url: string) => {
+export const loadApp = (window: BrowserWindow, name: string, url: string, fileName: string = "index.html") => {
   if (url) {
     window.loadURL(url);
   } else {
-    window.loadFile(path.join(__dirname, `../renderer/${name}/index.html`));
+    window.loadFile(path.join(__dirname, `../renderer/${name}/${fileName}`));
   }
 };
 

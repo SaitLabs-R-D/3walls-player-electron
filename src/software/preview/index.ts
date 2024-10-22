@@ -1,11 +1,13 @@
-import { BrowserWindow } from "electron";
+import { BrowserWindow, ipcMain } from "electron";
 import { focusWindow, loadApp } from "../helpers";
 import path from "path";
-import { APP_ICON_PATH, APP_PREFIX, WEBSITE_URL } from "../../../constants";
+import { APP_ICON_PATH, API_URL } from "../../../constants";
 import { store } from "../store";
+import axios from "axios";
+import log from "electron-log";
 
 export class Preview {
-  public isQuestionnaireOpen = false;
+  public isThankYouOpen = false;
   private window: BrowserWindow;
 
   public createWindow() {
@@ -25,6 +27,10 @@ export class Preview {
     this.window.on("closed", () => {
       this.window = null;
     });
+
+    ipcMain.on('close-window', (event) => {
+      this.window.close()
+    })
 
     this.window.webContents.on("did-fail-load", this.destroy);
 
@@ -47,7 +53,7 @@ export class Preview {
 
     this.window = null;
     store.removeListener("preview");
-    this.isQuestionnaireOpen = false;
+    this.isThankYouOpen = false;
   }
 
   public minimize() {
@@ -62,10 +68,18 @@ export class Preview {
     this.window.webContents.send("token", token);
   }
 
-  public loadQuestionnaire(token: string) {
-    this.window.loadURL(
-      `${WEBSITE_URL}/software/${token}/questionnaire?locale=${store.locale}`
-    );
-    this.isQuestionnaireOpen = true;
+  public loadThankYou(token: string) {
+    this.sendReviewEmail(token);
+    loadApp(this.window, PREVIEW_VITE_NAME, null, "thank_you.html");
+    this.isThankYouOpen = true;
   }
+
+  private async sendReviewEmail(token: string) {
+    try {
+      const res = await axios.post(`${API_URL}/reviews/email/${token}?locale=${store.locale}`);
+    } catch (e) {
+      log.error("failed to send email", e);
+    }
+  }
+
 }

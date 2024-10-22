@@ -26,7 +26,7 @@ export class Player {
   private screens: Part[] = [];
   private devMode: boolean;
   private floatingMenu: FloatingMenu;
-  private showQuestionnaire: () => void;
+  private showThankYou: () => void;
 
   private video = new Video();
 
@@ -37,8 +37,8 @@ export class Player {
     this.play();
   }
 
-  constructor(showQuestionnaire: () => void) {
-    this.showQuestionnaire = showQuestionnaire;
+  constructor(showThankYou: () => void) {
+    this.showThankYou = showThankYou;
   }
 
   public async loadLesson(token: string, devMode: boolean) {
@@ -102,7 +102,7 @@ export class Player {
       });
 
       screen.window.on("closed", () => {
-        this.showQuestionnaire();
+        this.showThankYou();
       });
     }
   }
@@ -202,12 +202,12 @@ export class Player {
   //==================//
 
   private onEscape() {
-    this.showQuestionnaire();
+    this.showThankYou();
   }
 
   private onNext() {
     if (this.idx === this.data.length - 1) {
-      this.showQuestionnaire();
+      this.showThankYou();
       return;
     }
     this.cancelRequests()
